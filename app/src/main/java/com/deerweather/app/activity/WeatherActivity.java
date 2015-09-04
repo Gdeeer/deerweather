@@ -1,5 +1,6 @@
 package com.deerweather.app.activity;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -20,7 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class WeatherActivity extends ActionBarActivity {
+public class WeatherActivity extends ActionBarActivity  implements View.OnClickListener{
 
     private LinearLayout weatherInfoLayout;
 
@@ -32,19 +33,27 @@ public class WeatherActivity extends ActionBarActivity {
     private TextView nightTempText;
 
     private TextView currentDateText;
-    /**
-     * «–ªª≥« –∞¥≈•
-     */
+
+    private TextView wave;
+    private TextView oc;
+
     private Button switchCity;
-    /**
-     * ∏¸–¬ÃÏ∆¯∞¥≈•
-     */
     private Button refreshWeather;
 
+    private TextView tomorrowDayTempText;
+    private TextView tomorrowNightTempText;
+    private TextView tomorrowWeatherText;
+
+
+    private TextView tomorrow2DayTempText;
+    private TextView tomorrow2NightTempText;
+    private TextView tomorrow2WeatherText;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather);
+
         weatherInfoLayout = (LinearLayout) findViewById(R.id.weather_info_layout);
         countyNameText = (TextView) findViewById(R.id.county_name);
         publishText = (TextView) findViewById(R.id.publish_text);
@@ -52,27 +61,62 @@ public class WeatherActivity extends ActionBarActivity {
         dayTempText = (TextView) findViewById(R.id.day_temp);
         nightTempText = (TextView) findViewById(R.id.night_temp);
         currentDateText = (TextView) findViewById(R.id.current_date);
-        //switchCity = (Button) findViewById(R.id.switch_city);
-        //refreshWeather = (Button) findViewById(R.id.refresh_weather);
-        String countyCode = getIntent().getStringExtra("county_id");
+        wave = (TextView) findViewById(R.id.wave);
+        oc =(TextView) findViewById(R.id.oc);
+        switchCity = (Button) findViewById(R.id.switch_city);
+        refreshWeather = (Button) findViewById(R.id.refresh_weather);
+        tomorrowDayTempText = (TextView) findViewById(R.id.tomorrow_day_temp);
+        tomorrowNightTempText = (TextView) findViewById(R.id.tomorrow_night_temp);
+        tomorrowWeatherText = (TextView) findViewById(R.id.tomorrow_weather);
+        tomorrow2DayTempText = (TextView) findViewById(R.id.tomorrow2_day_temp);
+        tomorrow2NightTempText = (TextView) findViewById(R.id.tomorrow2_night_temp);
+        tomorrow2WeatherText = (TextView) findViewById(R.id.tomorrow2_weather);
+        String countyCode = getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)) {
-        // ”–œÿº∂¥˙∫≈ ±æÕ»•≤È—ØÃÏ∆¯
-            publishText.setText("syncing...");
+            publishText.setText("ÂêåÊ≠•‰∏≠...");
             weatherInfoLayout.setVisibility(View.INVISIBLE);
             countyNameText.setVisibility(View.INVISIBLE);
             try {
                 queryWeatherCode(countyCode);
-                Log.d("queryWeatherCode", "yes");
             }catch (Exception e){
                 e.printStackTrace();
             }
         } else {
-        // √ª”–œÿº∂¥˙∫≈ ±æÕ÷±Ω”œ‘ æ±æµÿÃÏ∆¯
             showWeather();
-            Log.d("show", "show");
         }
-        //switchCity.setOnClickListener(this);
-        //refreshWeather.setOnClickListener(this);
+        switchCity.setOnClickListener(this);
+        refreshWeather.setOnClickListener(this);
+        refresh();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.switch_city:
+                Intent intent = new Intent(this, ChooseAreaActivity.class);
+                intent.putExtra("from_weather_activity", true);
+                startActivity(intent);
+                finish();
+            case R.id.refresh_weather:
+                refresh();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void refresh () {
+        publishText.setText("ÂêåÊ≠•‰∏≠...");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String countyCode = prefs.getString("county_code", "");
+        Log.d("Response", countyCode);
+        if (!TextUtils.isEmpty(countyCode)) {
+            try {
+                queryWeatherCode(countyCode);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void queryWeatherCode(String countyCode){
@@ -82,15 +126,14 @@ public class WeatherActivity extends ActionBarActivity {
         String appid6 = "9bd8f9";
         String halfUrl = "http://open.weather.com.cn/data/" +
                 "?areaid=" + countyCode +
-                "&type=" + "forecast_f" +
+                "&type=" + "forecast_v" +
                 "&date=" + date;
         String public_key = halfUrl + "&appid=" + appid;
         String private_key = "cff4df_SmartWeatherAPI_4f7b2e9";
         try {
             String key = HttpUtil.computeKey(public_key, private_key);
-            Log.d("key", key);
-            String fullUrl = halfUrl + "&key=" + key;
-            queryFromServer(fullUrl, "countyCode");
+            String fullUrl = halfUrl + "&appid=" + appid6 + "&key=" + key;
+            queryFromServer(fullUrl);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -98,14 +141,12 @@ public class WeatherActivity extends ActionBarActivity {
 
 
     /**
-     * ∏˘æ›¥´»Îµƒµÿ÷∑∫Õ¿‡–Õ»•œÚ∑˛ŒÒ∆˜≤È—ØÃÏ∆¯¥˙∫≈ªÚ’ﬂÃÏ∆¯–≈œ¢°£
+     * Ê†πÊçÆ‰º†ÂÖ•ÁöÑÂú∞ÂùÄÂíåÁ±ªÂûãÂéªÂêëÊúçÂä°Âô®Êü•ËØ¢Â§©Ê∞î‰ª£Âè∑ÊàñËÄÖÂ§©Ê∞î‰ø°ÊÅØ„ÄÇ
      */
-    private void queryFromServer(final String address, final String type) {
+    private void queryFromServer(final String address) {
         HttpUtil.sendHttpRequest(address, new HttpCallBackListener() {
             @Override
             public void onFinish(final String response) {
-                    // ¥¶¿Ì∑˛ŒÒ∆˜∑µªÿµƒÃÏ∆¯–≈œ¢
-                    Log.d("response", response);
                     Utility.handleWeatherResponse(WeatherActivity.this, response);
                     runOnUiThread(new Runnable() {
                         @Override
@@ -120,7 +161,7 @@ public class WeatherActivity extends ActionBarActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        publishText.setText("Õ¨≤Ω ß∞‹");
+                        publishText.setText("ÂêåÊ≠•Â§±Ë¥•");
                     }
                 });
             }
@@ -128,17 +169,40 @@ public class WeatherActivity extends ActionBarActivity {
     }
 
     /**
-     * ¥”SharedPreferencesŒƒº˛÷–∂¡»°¥Ê¥¢µƒÃÏ∆¯–≈œ¢£¨≤¢œ‘ æµΩΩÁ√Ê…œ°£
+     * ‰ªéSharedPreferencesÊñá‰ª∂‰∏≠ËØªÂèñÂ≠òÂÇ®ÁöÑÂ§©Ê∞î‰ø°ÊÅØÔºåÂπ∂ÊòæÁ§∫Âà∞ÁïåÈù¢‰∏ä„ÄÇ
      */
     private void showWeather() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         countyNameText.setText(prefs.getString("county_name", ""));
+        if(TextUtils.isEmpty(prefs.getString("day_temp", ""))){
+            dayTempText.setVisibility(View.GONE);
+            wave.setVisibility(View.GONE);
+            oc.setVisibility(View.GONE);
+        } else {
+            dayTempText.setVisibility(View.VISIBLE);
+            wave.setVisibility(View.VISIBLE);
+            oc.setVisibility(View.VISIBLE);
+        }
         dayTempText.setText(prefs.getString("day_temp", ""));
         nightTempText.setText(prefs.getString("night_temp", ""));
-        //weatherDespText.setText(prefs.getString("weather_desp", ""));
-        publishText.setText("ΩÒÃÏ" + prefs.getString("publish_time", "") + "∑¢≤º");
+        weatherText.setText(Utility.parseWeatherCode(prefs.getString("weather_code", "")));
+
+        tomorrowDayTempText.setText(prefs.getString("tomorrow_day_temp", ""));
+        tomorrowNightTempText.setText(prefs.getString("tomorrow_night_temp", ""));
+        tomorrowWeatherText.setText(Utility.parseWeatherCode(prefs.getString("tomorrow_weather_code", "")));
+
+        tomorrow2DayTempText.setText(prefs.getString("tomorrow2_day_temp", ""));
+        tomorrow2NightTempText.setText(prefs.getString("tomorrow2_night_temp", ""));
+        tomorrow2WeatherText.setText(Utility.parseWeatherCode(prefs.getString("tomorrow2_weather_code", "")));
+
+        publishText.setText("‰ªäÂ§©" + Utility.parsePublishTime(prefs.getString("publish_time", "")) + "ÂèëÂ∏É");
         currentDateText.setText(prefs.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         countyNameText.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 }
