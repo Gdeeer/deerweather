@@ -68,191 +68,93 @@ public class Utility {
     public static void handleWeatherResponse(Context context, String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-            JSONObject countyInfo = jsonObject.getJSONObject("c");
-            String countyCode = countyInfo.getString("c1");
-            String countyName = countyInfo.getString("c3");
-            JSONObject weatherInfoandTime = jsonObject.getJSONObject("f");
-            String publishTime = weatherInfoandTime.getString("f0");
-            JSONArray weatherInfo = weatherInfoandTime.getJSONArray("f1");
-            String dayWeatherCode = weatherInfo.getJSONObject(0).getString("fa");
-            String nightWeatherCode = weatherInfo.getJSONObject(0).getString("fb");
-            String dayTemp = weatherInfo.getJSONObject(0).getString("fc");
-            String nightTemp = weatherInfo.getJSONObject(0).getString("fd");
+            JSONArray heWeather = jsonObject.getJSONArray("HeWeather data service 3.0");
+            JSONObject heWeatherData = heWeather.getJSONObject(0);
+            JSONObject aqi = heWeatherData.getJSONObject("aqi");
+            JSONObject basic = heWeatherData.getJSONObject("basic");
+            JSONArray dailyForecast = heWeatherData.getJSONArray("daily_forecast");
+            //JSONArray hourlyForecast = heWeatherData.getJSONArray("hourly_forecast");
+            //String status = heWeatherData.getString("status");
+            JSONObject now = heWeatherData.getJSONObject("now");
 
-            String tomorrowDayWeatherCode = weatherInfo.getJSONObject(1).getString("fa");
-            String tomorrowDayTemp = weatherInfo.getJSONObject(1).getString("fc");
-            String tomorrowNightTemp = weatherInfo.getJSONObject(1).getString("fd");
+            JSONObject city = aqi.getJSONObject("city");
+            String aqiString = city.getString("aqi");
+            String qlty = city.getString("qlty");
+            String pm25 = city.getString("pm25");
 
-            String tomorrow2DayWeatherCode = weatherInfo.getJSONObject(2).getString("fa");
-            String tomorrow2DayTemp = weatherInfo.getJSONObject(2).getString("fc");
-            String tomorrow2NightTemp = weatherInfo.getJSONObject(2).getString("fd");
+            String nowWeather = now.getJSONObject("cond").getString("txt");
+            String nowTemp = now.getString("tmp");
 
-            saveWeatherInfo(context, countyCode, countyName, dayWeatherCode, nightWeatherCode,
-                    dayTemp, nightTemp, publishTime,
-                    tomorrowDayTemp, tomorrowDayWeatherCode, tomorrowNightTemp,
-                    tomorrow2DayTemp, tomorrow2DayWeatherCode, tomorrow2NightTemp);
+            JSONObject todayWeather = dailyForecast.getJSONObject(0);
+            String maxTempToday = todayWeather.getJSONObject("tmp").getString("max");
+            String minTempToday = todayWeather.getJSONObject("tmp").getString("min");
+
+
+            String countyCode = basic.getString("id");
+            String countyName = basic.getString("city");
+            String publishTime = basic.getJSONObject("update").getString("loc");
+
+            saveWeatherInfo(context, countyCode, countyName,publishTime,
+                    nowTemp, nowWeather, maxTempToday, minTempToday,
+                    aqiString, qlty, pm25);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
+    public static void handleFutureWeather(Context context, String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray heWeather = jsonObject.getJSONArray("HeWeather data service 3.0");
+            JSONObject heWeatherData = heWeather.getJSONObject(0);
+            JSONArray dailyForecast = heWeatherData.getJSONArray("daily_forecast");
+            int i;
+            for (i = 1; i < 7; i++) {
+                JSONObject weatherFutureInfo = dailyForecast.getJSONObject(i);
+                String minTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("min");
+                String maxTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("max");
+                String weatherFuture = weatherFutureInfo.getJSONObject("cond").getString("txt_d");
+                String dayFuture = weatherFutureInfo.getString("date");
+                saveWeatherInfofuture(context, minTempFuture, maxTempFuture,
+                        weatherFuture, dayFuture, i);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 将服务器返回的所有天气信息存储到SharedPreferences文件中。
      */
-    public static void saveWeatherInfo(Context context, String countyCode, String countyName,
-                                       String dayWeatherCode, String nightWeatherCode,
-                                       String dayTemp, String nightTemp, String publishTime,
-                                       String tomorrowDayTemp, String tomorrowDayWeatherCode,
-                                       String tomorrowNightTemp,
-                                       String tomorrow2DayTemp, String tomorrow2DayWeatherCode,
-                                       String tomorrow2NightTemp) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年M月d日", Locale.CHINA);
-        SimpleDateFormat sdf2 = new SimpleDateFormat("HHmm", Locale.CHINA);
+    public static void saveWeatherInfo(Context context, String countyCode, String countyName, String publishTime,
+                                       String nowTemp, String nowWeather, String maxTemp, String minTemp,
+                                        String aqiString, String qlty, String pm25) {
+
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("county_selected", true);
         editor.putString("county_code", countyCode);
         editor.putString("county_name", countyName);
         editor.putString("publish_time", publishTime);
+        editor.putString("now_temp", nowTemp);
+        editor.putString("now_weather", nowWeather);
+        editor.putString("max_temp", maxTemp);
+        editor.putString("min_temp", minTemp);
 
-        String hour = sdf2.format(new Date());
-        if (hour.compareTo("1800") < 0) {
-            editor.putString("weather_code", dayWeatherCode);
-        } else {
-            editor.putString("weather_code", nightWeatherCode);
-        }
-        editor.putString("day_temp", dayTemp);
-        editor.putString("night_temp", nightTemp);
+        editor.putString("aqi", aqiString);
+        editor.putString("qlty", qlty);
+        editor.putString("pm25", pm25);
 
-        editor.putString("tomorrow_day_temp", tomorrowDayTemp);
-        editor.putString("tomorrow_night_temp", tomorrowNightTemp);
-        editor.putString("tomorrow_weather_code", tomorrowDayWeatherCode);
-
-        editor.putString("tomorrow2_day_temp", tomorrow2DayTemp);
-        editor.putString("tomorrow2_night_temp", tomorrow2NightTemp);
-        editor.putString("tomorrow2_weather_code", tomorrow2DayWeatherCode);
-
-        editor.putString("current_date", sdf.format(new Date()));
         editor.apply();
     }
 
-    public static String parsePublishTime(String publishTime) {
-        String publishTime3;
-        char[] array = publishTime.toCharArray();
-        if (array[8] == '0') {
-            publishTime3 = " 08:00 ";
-        } else {
-            if (array[9] == '1') {
-                publishTime3 = " 11:00 ";
-            } else {
-                publishTime3 = " 18:00 ";
-            }
-        }
-        return publishTime3;
+    public static void saveWeatherInfofuture(Context context, String minTempFuture, String maxTempFuture,
+                                             String weatherFuture, String dayFuture, int i) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putBoolean("county_selected", true);
+        editor.putString("min_temp_future"+i, minTempFuture);
+        editor.putString("max_temp_future"+i, maxTempFuture);
+        editor.putString("weather_future"+i, weatherFuture);
+        editor.putString("day_future"+i, dayFuture);
+        editor.apply();
     }
 
-    public static String parseWeatherCode(String weatherCode) {
-        String weather = "无";
-        switch (weatherCode) {
-            case "00":
-                weather = "晴";
-                break;
-            case "01":
-                weather = "多云";
-                break;
-            case "02":
-                weather = "阴";
-                break;
-            case "03":
-                weather = "阵雨";
-                break;
-            case "04":
-                weather = "雷阵雨";
-                break;
-            case "05":
-                weather = "雷阵雨伴有冰雹";
-                break;
-            case "06":
-                weather = "雨夹雪";
-                break;
-            case "07":
-                weather = "小雨";
-                break;
-            case "08":
-                weather = "中雨";
-                break;
-            case "09":
-                weather = "大雨";
-                break;
-            case "10":
-                weather = "暴雨";
-                break;
-            case "11":
-                weather = "大暴雨";
-                break;
-            case "12":
-                weather = "特大暴雨";
-                break;
-            case "13":
-                weather = "阵雪";
-                break;
-            case "14":
-                weather = "小雪";
-                break;
-            case "15":
-                weather = "中雪";
-                break;
-            case "16":
-                weather = "大雪";
-                break;
-            case "17":
-                weather = "暴雪";
-                break;
-            case "18":
-                weather = "雾";
-                break;
-            case "19":
-                weather = "冻雨";
-                break;
-            case "20":
-                weather = "沙尘暴";
-                break;
-            case "21":
-                weather = "小到中雨";
-                break;
-            case "22":
-                weather = "中到大雨";
-                break;
-            case "23":
-                weather = "大到暴雨";
-                break;
-            case "24":
-                weather = "暴雨到大暴雨";
-                break;
-            case "25":
-                weather = "大暴雨到特大暴雨";
-                break;
-            case "26":
-                weather = "小到中雪";
-                break;
-            case "27":
-                weather = "中到大雪";
-                break;
-            case "28":
-                weather = "大到暴雪";
-                break;
-            case "29":
-                weather = "浮尘";
-                break;
-            case "30":
-                weather = "扬沙";
-                break;
-            case "31":
-                weather = "强沙尘暴";
-                break;
-            case "53":
-                weather = "霾";
-                break;
-        }
-        return weather;
-    }
 }
