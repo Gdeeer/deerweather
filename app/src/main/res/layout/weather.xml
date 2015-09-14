@@ -1,13 +1,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.deerweather.app.activity.WeatherActivity"
+    android:background="#739CCE"
     android:orientation="vertical">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#739CCE" >
+        android:layout_height="50dp" >
 
         <Button
             android:id="@+id/switch_city"
@@ -35,201 +36,19 @@
             android:background="@drawable/refresh" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="#739CCE" >
-        <TextView
-            android:id="@+id/publish_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="10dp"
-            android:textColor="#FFF"
-            android:textSize="18sp" />
-        <LinearLayout
-            android:id="@+id/weather_info_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:orientation="vertical" >
-            <TextView
-                android:id="@+id/current_date"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="18sp" />
-            <TextView
-                android:id="@+id/weather"
-                android:layout_width="wrap_content"
-                android:layout_height="70dp"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textStyle="bold"
-                android:textSize="50sp" />
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal" >
-                <TextView
-                    android:id="@+id/night_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:textColor="#FFF"
-                    android:textSize="40sp" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginRight="10dp"
-                    android:text="℃"
-                    android:textColor="#FFF"
-                    android:textSize="40sp" />
-                <TextView
-                    android:id="@+id/wave"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="10dp"
-                    android:text="~"
-                    android:textColor="#FFF"
-                    android:textSize="40sp" />
-                <TextView
-                    android:id="@+id/day_temp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:textColor="#FFF"
-                    android:textSize="40sp" />
-                <TextView
-                    android:id="@+id/oc"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="5dp"
-                    android:text="℃"
-                    android:textColor="#FFF"
-                    android:textSize="40sp" />
-            </LinearLayout>
-        </LinearLayout>
-    </RelativeLayout>
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#739CCE">
-        <LinearLayout
-            android:id="@+id/other_weather_info_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal" >
-            <TextView
-                android:id="@+id/tomorrow_night_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"
-                android:text="℃~"/>
-            <TextView
-                android:id="@+id/tomorrow_day_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"
-                android:text="℃"/>
 
-            <TextView
-                android:id="@+id/tomorrow_weather"
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"
-                android:text="明天"/>
-        </LinearLayout>
-    </RelativeLayout>
-    <RelativeLayout
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#739CCE">
-        <LinearLayout
-            android:id="@+id/other2_weather_info_layout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_centerInParent="true"
-            android:orientation="horizontal" >
-            <TextView
-                android:id="@+id/tomorrow2_night_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"
-                android:text="℃~"/>
-            <TextView
-                android:id="@+id/tomorrow2_day_temp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"
-                android:text="℃"/>
+        android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/tomorrow2_weather"
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textColor="#FFF"
-                android:textSize="20sp"
-                android:text="后天"/>
-        </LinearLayout>
-    </RelativeLayout>
+        <ListView
+            android:id="@+id/temp_weather_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="18dp">
+        </ListView>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

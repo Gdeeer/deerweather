@@ -10,40 +10,28 @@ import com.deerweather.app.db.DeerWeatherOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by DELL-PC on 2015/6/22.
- */
 public class DeerWeatherDB {
-    /**
-     * 数据库名
-     */
+
     public static final String DB_NAME = "deer_weather";
-    /**
-     * 数据库版本
-     */
+
+
     public static final int VERSION = 1;
     private static DeerWeatherDB deerWeatherDB;
     private SQLiteDatabase db;
 
-    /**
-     * 将构造方法私有化
-     */
+
     private DeerWeatherDB(Context context) {
         DeerWeatherOpenHelper dbHelper = new DeerWeatherOpenHelper(context, DB_NAME, null, VERSION);
         db = dbHelper.getWritableDatabase();
     }
-    /**
-     * 获取DeerWeatherDB的实例。
-     */
+
     public synchronized static DeerWeatherDB getInstance(Context context){
         if (deerWeatherDB == null) {
             deerWeatherDB = new DeerWeatherDB(context);
         }
         return deerWeatherDB;
     }
-    /**
-    * 将Province实例储存到数据库
-    */
+
     public void saveProvince(Province province){
         if (province != null){
             ContentValues values = new ContentValues();
@@ -55,9 +43,7 @@ public class DeerWeatherDB {
         db.delete("Province", null, null);
     }
 
-    /**
-     * 从数据库读取全国所有的省份信息。
-     */
+
     public List<Province> loadProvinces() {
         List<Province> list = new  ArrayList<>();
         Cursor cursor = db.query("Province", null, null, null, null, null, null);
@@ -78,9 +64,7 @@ public class DeerWeatherDB {
         db.delete("County", null, null);
     }
 
-    /**
-     * 从数据库读取某省下所有的城市信息。
-     */
+
     public List<City> loadCities(String provinceName) {
         List<City> list = new ArrayList<>();
         Cursor cursor = db.query("County", null, "province_name = ?",
@@ -98,9 +82,7 @@ public class DeerWeatherDB {
         return list;
     }
 
-    /**
-     * 将County实例存储到数据库。
-     */
+
     public void saveCounty(County county) {
         if (county != null) {
             ContentValues values = new ContentValues();
@@ -111,9 +93,7 @@ public class DeerWeatherDB {
             db.insert("County", null, values);
         }
     }
-    /**
-     * 从数据库读取某城市下所有的县信息。
-     */
+
     public List<County> loadCounties(String cityName) {
         List<County> list = new ArrayList<>();
         Cursor cursor = db.query("County", null, "city_name = ?",

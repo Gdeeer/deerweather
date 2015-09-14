@@ -127,7 +127,7 @@ public class Utility {
      */
     public static void saveWeatherInfo(Context context, String countyCode, String countyName, String publishTime,
                                        String nowTemp, String nowWeather, String maxTemp, String minTemp,
-                                        String aqiString, String qlty, String pm25) {
+                                       String aqiString, String qlty, String pm25) {
 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("county_selected", true);

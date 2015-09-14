@@ -3,79 +3,64 @@ package com.deerweather.app.activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.deerweather.app.Adapter.TempAndWeatherAdapter;
 import com.deerweather.app.R;
+import com.deerweather.app.model.TempAndWeather;
 import com.deerweather.app.util.HttpCallBackListener;
 import com.deerweather.app.util.HttpUtil;
 import com.deerweather.app.util.Utility;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 
-public class WeatherActivity extends ActionBarActivity  implements View.OnClickListener{
+public class WeatherActivity extends ActionBarActivity  implements View.OnClickListener,
+        SwipeRefreshLayout.OnRefreshListener {
 
-    private LinearLayout weatherInfoLayout;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private TextView countyNameText;
-    private TextView publishText;
-    private TextView weatherText;
 
-    private TextView dayTempText;
-    private TextView nightTempText;
+    private List<TempAndWeather> tempAndWeatherList = new ArrayList<>();
+    private TempAndWeatherAdapter adapter;
 
-    private TextView currentDateText;
-
-    private TextView wave;
-    private TextView oc;
+    private ListView listView;
 
     private Button switchCity;
     private Button refreshWeather;
-
-    private TextView tomorrowDayTempText;
-    private TextView tomorrowNightTempText;
-    private TextView tomorrowWeatherText;
-
-
-    private TextView tomorrow2DayTempText;
-    private TextView tomorrow2NightTempText;
-    private TextView tomorrow2WeatherText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.weather);
 
-        weatherInfoLayout = (LinearLayout) findViewById(R.id.weather_info_layout);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light, android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+        listView = (ListView) findViewById(R.id.temp_weather_list_view);
+        adapter = new TempAndWeatherAdapter(WeatherActivity.this,
+                R.layout.item1, tempAndWeatherList);
+        listView.setAdapter(adapter);
         countyNameText = (TextView) findViewById(R.id.county_name);
-        publishText = (TextView) findViewById(R.id.publish_text);
-        weatherText = (TextView) findViewById(R.id.weather);
-        dayTempText = (TextView) findViewById(R.id.day_temp);
-        nightTempText = (TextView) findViewById(R.id.night_temp);
-        currentDateText = (TextView) findViewById(R.id.current_date);
-        wave = (TextView) findViewById(R.id.wave);
-        oc =(TextView) findViewById(R.id.oc);
         switchCity = (Button) findViewById(R.id.switch_city);
         refreshWeather = (Button) findViewById(R.id.refresh_weather);
-        tomorrowDayTempText = (TextView) findViewById(R.id.tomorrow_day_temp);
-        tomorrowNightTempText = (TextView) findViewById(R.id.tomorrow_night_temp);
-        tomorrowWeatherText = (TextView) findViewById(R.id.tomorrow_weather);
-        tomorrow2DayTempText = (TextView) findViewById(R.id.tomorrow2_day_temp);
-        tomorrow2NightTempText = (TextView) findViewById(R.id.tomorrow2_night_temp);
-        tomorrow2WeatherText = (TextView) findViewById(R.id.tomorrow2_weather);
-        String countyCode = getIntent().getStringExtra("county_code");
+        String countyCode = "CN" + getIntent().getStringExtra("county_code");
         if (!TextUtils.isEmpty(countyCode)) {
-            publishText.setText("同步中...");
-            weatherInfoLayout.setVisibility(View.INVISIBLE);
-            countyNameText.setVisibility(View.INVISIBLE);
+            countyNameText.setText("同步中...");
             try {
                 queryWeatherCode(countyCode);
             }catch (Exception e){
@@ -86,7 +71,20 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
         }
         switchCity.setOnClickListener(this);
         refreshWeather.setOnClickListener(this);
+
         refresh();
+    }
+
+    @Override
+    public void onRefresh() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 停止刷新
+                refresh();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 1000);
     }
 
     @Override
@@ -106,10 +104,9 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
     }
 
     private void refresh () {
-        publishText.setText("同步中...");
+        countyNameText.setText("同步中...");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String countyCode = prefs.getString("county_code", "");
-        Log.d("Response", countyCode);
         if (!TextUtils.isEmpty(countyCode)) {
             try {
                 queryWeatherCode(countyCode);
@@ -120,34 +117,21 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
     }
 
     private void queryWeatherCode(String countyCode){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddhhmm", Locale.CHINA);
-        String date = dateFormat.format(new Date());
-        String appid = "9bd8f9f8e0d30ad3";
-        String appid6 = "9bd8f9";
-        String halfUrl = "http://open.weather.com.cn/data/" +
-                "?areaid=" + countyCode +
-                "&type=" + "forecast_v" +
-                "&date=" + date;
-        String public_key = halfUrl + "&appid=" + appid;
-        String private_key = "cff4df_SmartWeatherAPI_4f7b2e9";
+        String httpUrl = "https://api.heweather.com/x3/weather?cityid="+countyCode+"&key=13d63a6fe83c44c897d62002f4c98551";
         try {
-            String key = HttpUtil.computeKey(public_key, private_key);
-            String fullUrl = halfUrl + "&appid=" + appid6 + "&key=" + key;
-            queryFromServer(fullUrl);
+            queryFromServer(httpUrl);
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
 
-    /**
-     * 根据传入的地址和类型去向服务器查询天气代号或者天气信息。
-     */
     private void queryFromServer(final String address) {
         HttpUtil.sendHttpRequest(address, new HttpCallBackListener() {
             @Override
             public void onFinish(final String response) {
                     Utility.handleWeatherResponse(WeatherActivity.this, response);
+                    Utility.handleFutureWeather(WeatherActivity.this, response);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -161,44 +145,45 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        publishText.setText("同步失败");
+                        countyNameText.setText("同步失败");
                     }
                 });
             }
         });
     }
 
-    /**
-     * 从SharedPreferences文件中读取存储的天气信息，并显示到界面上。
-     */
     private void showWeather() {
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         countyNameText.setText(prefs.getString("county_name", ""));
-        if(TextUtils.isEmpty(prefs.getString("day_temp", ""))){
-            dayTempText.setVisibility(View.GONE);
-            wave.setVisibility(View.GONE);
-            oc.setVisibility(View.GONE);
-        } else {
-            dayTempText.setVisibility(View.VISIBLE);
-            wave.setVisibility(View.VISIBLE);
-            oc.setVisibility(View.VISIBLE);
+
+        TempAndWeather tempAndWeather1 = new TempAndWeather();
+        tempAndWeather1.setPublishTime(prefs.getString("publish_time", "") + " 更新");
+        tempAndWeather1.setNowTemp(prefs.getString("now_temp", ""));
+        tempAndWeather1.setMinTemp(prefs.getString("min_temp", ""));
+        tempAndWeather1.setMaxTemp(prefs.getString("max_temp", ""));
+        tempAndWeatherList.clear();
+        tempAndWeatherList.add(tempAndWeather1);
+        TempAndWeather tempAndWeather2 = new TempAndWeather();
+        tempAndWeather2.setWeatherNow(prefs.getString("now_weather", ""));
+        tempAndWeatherList.add(tempAndWeather2);
+        TempAndWeather tempAndWeather3 = new TempAndWeather();
+        tempAndWeather3.setQlty(prefs.getString("qlty", ""));
+        tempAndWeather3.setAqi(prefs.getString("aqi", ""));
+        tempAndWeather3.setPm25(prefs.getString("pm25", ""));
+        tempAndWeatherList.add(tempAndWeather3);
+        int i;
+        for (i = 1; i < 7; i++) {
+            TempAndWeather tempAndWeather4 = new TempAndWeather();
+            tempAndWeather4.setMinTempFuture(prefs.getString("min_temp_future" + i, ""));
+            tempAndWeather4.setMaxTempFuture(prefs.getString("max_temp_future" + i, ""));
+            tempAndWeather4.setWeatherFuture(prefs.getString("weather_future" + i, ""));
+            tempAndWeather4.setDayFuture(prefs.getString("day_future" + i, ""));
+            Log.d("day", prefs.getString("day_future" + i, "")+i);
+            tempAndWeatherList.add(tempAndWeather4);
         }
-        dayTempText.setText(prefs.getString("day_temp", ""));
-        nightTempText.setText(prefs.getString("night_temp", ""));
-        weatherText.setText(Utility.parseWeatherCode(prefs.getString("weather_code", "")));
+        adapter.notifyDataSetChanged();
 
-        tomorrowDayTempText.setText(prefs.getString("tomorrow_day_temp", ""));
-        tomorrowNightTempText.setText(prefs.getString("tomorrow_night_temp", ""));
-        tomorrowWeatherText.setText(Utility.parseWeatherCode(prefs.getString("tomorrow_weather_code", "")));
-
-        tomorrow2DayTempText.setText(prefs.getString("tomorrow2_day_temp", ""));
-        tomorrow2NightTempText.setText(prefs.getString("tomorrow2_night_temp", ""));
-        tomorrow2WeatherText.setText(Utility.parseWeatherCode(prefs.getString("tomorrow2_weather_code", "")));
-
-        publishText.setText("今天" + Utility.parsePublishTime(prefs.getString("publish_time", "")) + "发布");
-        currentDateText.setText(prefs.getString("current_date", ""));
-        weatherInfoLayout.setVisibility(View.VISIBLE);
-        countyNameText.setVisibility(View.VISIBLE);
     }
 
     @Override
