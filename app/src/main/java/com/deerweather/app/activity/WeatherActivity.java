@@ -58,11 +58,11 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
         countyNameText = (TextView) findViewById(R.id.county_name);
         switchCity = (Button) findViewById(R.id.switch_city);
         refreshWeather = (Button) findViewById(R.id.refresh_weather);
-        String countyCode = "CN" + getIntent().getStringExtra("county_code");
-        if (!TextUtils.isEmpty(countyCode)) {
+        String countyCodePart = getIntent().getStringExtra("county_code_part");
+        if (!TextUtils.isEmpty(countyCodePart)) {
             countyNameText.setText("同步中...");
             try {
-                queryWeatherCode(countyCode);
+                queryCountyCode(countyCodePart);
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -72,7 +72,7 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
         switchCity.setOnClickListener(this);
         refreshWeather.setOnClickListener(this);
 
-        refresh();
+        //refresh();
     }
 
     @Override
@@ -84,7 +84,7 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
                 refresh();
                 swipeRefreshLayout.setRefreshing(false);
             }
-        }, 1000);
+        }, 600);
     }
 
     @Override
@@ -116,20 +116,25 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
         }
     }
 
+    private void queryCountyCode(String countyCodePart) {
+        String address = "http://www.weather.com.cn/data/list3/city" + countyCodePart + ".xml";
+        queryFromServer(address, "countyCodePart");
+    }
+
     private void queryWeatherCode(String countyCode){
         String httpUrl = "https://api.heweather.com/x3/weather?cityid="+countyCode+"&key=13d63a6fe83c44c897d62002f4c98551";
         try {
-            queryFromServer(httpUrl);
+            queryFromServer(httpUrl, "weather");
         } catch (Exception e){
             e.printStackTrace();
         }
     }
 
-
-    private void queryFromServer(final String address) {
+    private void queryFromServer(final String address, final String type) {
         HttpUtil.sendHttpRequest(address, new HttpCallBackListener() {
             @Override
             public void onFinish(final String response) {
+                if ("weather".equals(type)) {
                     Utility.handleWeatherResponse(WeatherActivity.this, response);
                     Utility.handleFutureWeather(WeatherActivity.this, response);
                     runOnUiThread(new Runnable() {
@@ -138,6 +143,15 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
                             showWeather();
                         }
                     });
+                } else if ("countyCodePart".equals(type)) {
+                    if (!TextUtils.isEmpty(response)) {
+                        String[] array = response.split("\\|");
+                        if (array != null && array.length == 2) {
+                            String countyCode = "CN" + array[1];
+                            queryWeatherCode(countyCode);
+                        }
+                    }
+                }
             }
 
             @Override
@@ -156,7 +170,6 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         countyNameText.setText(prefs.getString("county_name", ""));
-
         TempAndWeather tempAndWeather1 = new TempAndWeather();
         tempAndWeather1.setPublishTime(prefs.getString("publish_time", "") + " 更新");
         tempAndWeather1.setNowTemp(prefs.getString("now_temp", ""));
@@ -173,13 +186,12 @@ public class WeatherActivity extends ActionBarActivity  implements View.OnClickL
         tempAndWeather3.setPm25(prefs.getString("pm25", ""));
         tempAndWeatherList.add(tempAndWeather3);
         int i;
-        for (i = 1; i < 7; i++) {
+        for (i = 1; i < 8; i++) {
             TempAndWeather tempAndWeather4 = new TempAndWeather();
             tempAndWeather4.setMinTempFuture(prefs.getString("min_temp_future" + i, ""));
             tempAndWeather4.setMaxTempFuture(prefs.getString("max_temp_future" + i, ""));
             tempAndWeather4.setWeatherFuture(prefs.getString("weather_future" + i, ""));
             tempAndWeather4.setDayFuture(prefs.getString("day_future" + i, ""));
-            Log.d("day", prefs.getString("day_future" + i, "")+i);
             tempAndWeatherList.add(tempAndWeather4);
         }
         adapter.notifyDataSetChanged();

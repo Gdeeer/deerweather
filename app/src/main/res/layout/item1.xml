@@ -13,6 +13,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
                 android:textColor="#FFF"
                 android:textSize="18sp" />
     <TextView

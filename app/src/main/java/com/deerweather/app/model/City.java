@@ -6,26 +6,29 @@ package com.deerweather.app.model;
 public class City {
     private int id;
     private String cityName;
-    private String provinceName;
-
+    private String cityCode;
+    private int provinceId;
     public int getId() {
         return id;
     }
     public void setId(int id) {
         this.id = id;
     }
-
     public String getCityName() {
         return cityName;
     }
     public void setCityName(String cityName) {
         this.cityName = cityName;
     }
-
-    public String getProvinceName() {
-        return provinceName;
+    public String getCityCode() {
+        return cityCode;
+    }public void setCityCode(String cityCode) {
+        this.cityCode = cityCode;
     }
-    public void setProvinceName(String provinceName) {
-        this.provinceName = provinceName;
+    public int getProvinceId() {
+        return provinceId;
+    }
+    public void setProvinceId(int provinceId) {
+        this.provinceId = provinceId;
     }
 }

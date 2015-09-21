@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.deerweather.app.db.DeerWeatherOpenHelper;
 
@@ -32,53 +33,58 @@ public class DeerWeatherDB {
         return deerWeatherDB;
     }
 
-    public void saveProvince(Province province){
-        if (province != null){
+    public void saveProvince(Province province) {
+        if (province != null) {
             ContentValues values = new ContentValues();
             values.put("province_name", province.getProvinceName());
+            values.put("province_code", province.getProvinceCode());
             db.insert("Province", null, values);
         }
     }
-    public void deleteProvinces() {
-        db.delete("Province", null, null);
-    }
-
 
     public List<Province> loadProvinces() {
-        List<Province> list = new  ArrayList<>();
+        List<Province> list = new ArrayList<>();
         Cursor cursor = db.query("Province", null, null, null, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 Province province = new Province();
                 province.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                province.setProvinceName(cursor.getString(cursor.getColumnIndex("province_name")));
+                province.setProvinceName(cursor.getString(cursor
+                        .getColumnIndex("province_name")));
+                province.setProvinceCode(cursor.getString(cursor.getColumnIndex("province_code")));
                 list.add(province);
             } while (cursor.moveToNext());
         }
-        cursor.close();
         return list;
     }
 
-
-    public void deleteCounties() {
-        db.delete("County", null, null);
+    public void saveCity(City city) {
+        if (city != null) {
+            ContentValues values = new ContentValues();
+            values.put("city_name", city.getCityName());
+            values.put("city_code", city.getCityCode());
+            values.put("province_id", city.getProvinceId());
+            db.insert("City", null, values);
+        }
     }
 
 
-    public List<City> loadCities(String provinceName) {
+    public List<City> loadCities(int provinceId) {
         List<City> list = new ArrayList<>();
-        Cursor cursor = db.query("County", null, "province_name = ?",
-                new String[]{provinceName}, "city_name", null, null);
+        Cursor cursor = db.query("City", null, "province_id = ?",
+                new String[] { String.valueOf(provinceId) }, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 City city = new City();
-                    city.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                    city.setCityName(cursor.getString(cursor.getColumnIndex("city_name")));
-                    city.setProvinceName(provinceName);
-                    list.add(city);
+                city.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                city.setCityName(cursor.getString(cursor
+                        .getColumnIndex("city_name")));
+                city.setCityCode(cursor.getString(cursor
+                        .getColumnIndex("city_code")));
+                city.setProvinceId(provinceId);
+                list.add(city);
             } while (cursor.moveToNext());
         }
-        cursor.close();
         return list;
     }
 
@@ -86,29 +92,30 @@ public class DeerWeatherDB {
     public void saveCounty(County county) {
         if (county != null) {
             ContentValues values = new ContentValues();
-            values.put("county_code", county.getCountyCode());
             values.put("county_name", county.getCountyName());
-            values.put("city_name", county.getCityName());
-            values.put("province_name", county.getProvinceName());
+            values.put("county_code", county.getCountyCode());
+            values.put("city_id", county.getCityId());
             db.insert("County", null, values);
         }
     }
 
-    public List<County> loadCounties(String cityName) {
+    public List<County> loadCounties(int cityId) {
         List<County> list = new ArrayList<>();
-        Cursor cursor = db.query("County", null, "city_name = ?",
-                new String[] { String.valueOf(cityName) }, null, null, null);
+        Cursor cursor = db.query("County", null, "city_id = ?",
+                new String[] { String.valueOf(cityId) }, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 County county = new County();
                 county.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                county.setCountyCode(cursor.getString(cursor.getColumnIndex("county_code")));
-                county.setCountyName(cursor.getString(cursor.getColumnIndex("county_name")));
-                county.setCityName(cityName);
+                county.setCountyName(cursor.getString(cursor
+                        .getColumnIndex("county_name")));
+                county.setCountyCode(cursor.getString(cursor
+                        .getColumnIndex("county_code")));
+                Log.d("county",cursor.getString(cursor.getColumnIndex("county_code")) );
+                county.setCityId(cityId);
                 list.add(county);
             } while (cursor.moveToNext());
         }
-        cursor.close();
         return list;
     }
 }

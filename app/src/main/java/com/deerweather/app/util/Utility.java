@@ -6,6 +6,7 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.deerweather.app.model.City;
 import com.deerweather.app.model.County;
 import com.deerweather.app.model.DeerWeatherDB;
 import com.deerweather.app.model.Province;
@@ -25,35 +26,53 @@ public class Utility {
     /**
      * 解析和处理文件中返回的省级数据
      */
-    public static void handleProvincesResponse(DeerWeatherDB deerWeatherDB, String response) {
-        deerWeatherDB.deleteProvinces();
+    public synchronized static boolean handleProvincesResponse(DeerWeatherDB deerWeatherDB, String response) {
         if (!TextUtils.isEmpty(response)) {
             String[] allProvinces = response.split(",");
-            for (String p : allProvinces) {
-                Province province = new Province();
-                province.setProvinceName(p);
-                Log.d("handleProvincesResponse", province.getProvinceName());
-                deerWeatherDB.saveProvince(province);
+            if (allProvinces != null && allProvinces.length > 0) {
+                for (String p : allProvinces) {
+                    String[] array = p.split("\\|");
+                    Province province = new Province();
+                    province.setProvinceCode(array[0]);
+                    province.setProvinceName(array[1]);
+                    deerWeatherDB.saveProvince(province);
+                }
+                return true;
             }
         }
+        return false;
+    }
+
+    public static boolean handleCitiesResponse(DeerWeatherDB deerWeatherDB, String response, int provinceId) {
+        if (!TextUtils.isEmpty(response)) {
+            String[] allCities = response.split(",");
+            if (allCities != null && allCities.length > 0) {
+                for (String c : allCities) {
+                    String[] array = c.split("\\|");
+                    City city = new City();
+                    city.setCityCode(array[0]);
+                    city.setCityName(array[1]);
+                    city.setProvinceId(provinceId);
+                    deerWeatherDB.saveCity(city);
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
 
-    /**
-     * 解析和处理文件中返回的县级数据
-     */
-    public synchronized static boolean handleCountiesResponse(DeerWeatherDB deerWeatherDB, String response) {
-        deerWeatherDB.deleteCounties();
+    public static boolean handleCountiesResponse(DeerWeatherDB deerWeatherDB,
+                                                 String response, int cityId) {
         if (!TextUtils.isEmpty(response)) {
-            String[] allcounties = response.split(",\\.");
-            if (allcounties.length > 0) {
-                for (String c : allcounties) {
-                    String[] array = c.split(",");
+            String[] allCounties = response.split(",");
+            if (allCounties != null && allCounties.length > 0) {
+                for (String c : allCounties) {
+                    String[] array = c.split("\\|");
                     County county = new County();
                     county.setCountyCode(array[0]);
                     county.setCountyName(array[1]);
-                    county.setCityName(array[2]);
-                    county.setProvinceName(array[3]);
+                    county.setCityId(cityId);
                     deerWeatherDB.saveCounty(county);
                 }
                 return true;
@@ -68,19 +87,25 @@ public class Utility {
     public static void handleWeatherResponse(Context context, String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
+            Log.d("countyname", response);
             JSONArray heWeather = jsonObject.getJSONArray("HeWeather data service 3.0");
             JSONObject heWeatherData = heWeather.getJSONObject(0);
-            JSONObject aqi = heWeatherData.getJSONObject("aqi");
+            String aqiString = "空";
+            String qlty = "空";
+            String pm25 = "空";
+            if (heWeatherData.has("aqi")) {
+                JSONObject aqi = heWeatherData.getJSONObject("aqi");
+                JSONObject city = aqi.getJSONObject("city");
+                aqiString = city.getString("aqi");
+                qlty = city.getString("qlty");
+                pm25 = city.getString("pm25");
+            }
             JSONObject basic = heWeatherData.getJSONObject("basic");
             JSONArray dailyForecast = heWeatherData.getJSONArray("daily_forecast");
             //JSONArray hourlyForecast = heWeatherData.getJSONArray("hourly_forecast");
             //String status = heWeatherData.getString("status");
             JSONObject now = heWeatherData.getJSONObject("now");
 
-            JSONObject city = aqi.getJSONObject("city");
-            String aqiString = city.getString("aqi");
-            String qlty = city.getString("qlty");
-            String pm25 = city.getString("pm25");
 
             String nowWeather = now.getJSONObject("cond").getString("txt");
             String nowTemp = now.getString("tmp");
@@ -92,6 +117,7 @@ public class Utility {
 
             String countyCode = basic.getString("id");
             String countyName = basic.getString("city");
+            Log.d("countyname", countyName);
             String publishTime = basic.getJSONObject("update").getString("loc");
 
             saveWeatherInfo(context, countyCode, countyName,publishTime,
@@ -111,10 +137,11 @@ public class Utility {
             int i;
             for (i = 1; i < 7; i++) {
                 JSONObject weatherFutureInfo = dailyForecast.getJSONObject(i);
-                String minTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("min");
-                String maxTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("max");
+                String minTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("min")+"~";
+                String maxTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("max")+"℃";
                 String weatherFuture = weatherFutureInfo.getJSONObject("cond").getString("txt_d");
-                String dayFuture = weatherFutureInfo.getString("date");
+                String dayFuture = weatherFutureInfo.getString("date").substring(5,7)+"/"
+                        + weatherFutureInfo.getString("date").substring(8,10);
                 saveWeatherInfofuture(context, minTempFuture, maxTempFuture,
                         weatherFuture, dayFuture, i);
             }
@@ -133,6 +160,7 @@ public class Utility {
         editor.putBoolean("county_selected", true);
         editor.putString("county_code", countyCode);
         editor.putString("county_name", countyName);
+        Log.d("countyname", countyName);
         editor.putString("publish_time", publishTime);
         editor.putString("now_temp", nowTemp);
         editor.putString("now_weather", nowWeather);

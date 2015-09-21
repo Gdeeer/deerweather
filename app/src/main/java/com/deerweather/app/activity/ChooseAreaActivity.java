@@ -6,18 +6,22 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.deerweather.app.R;
 import com.deerweather.app.model.City;
 import com.deerweather.app.model.County;
 import com.deerweather.app.model.DeerWeatherDB;
 import com.deerweather.app.model.Province;
+import com.deerweather.app.util.HttpCallBackListener;
+import com.deerweather.app.util.HttpUtil;
 import com.deerweather.app.util.Utility;
 
 import java.io.BufferedReader;
@@ -32,8 +36,6 @@ public class ChooseAreaActivity extends ActionBarActivity {
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
-    public static final String FILE_PROVINCE = "province.txt";
-    public static final String FILE_COUNTY = "weather.txt";
 
     private boolean isFromWeatherActivity;
 
@@ -68,9 +70,7 @@ public class ChooseAreaActivity extends ActionBarActivity {
         listView = (ListView) findViewById(R.id.list_view);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
-
         deerWeatherDB = DeerWeatherDB.getInstance(this);
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -83,7 +83,7 @@ public class ChooseAreaActivity extends ActionBarActivity {
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String countyCode = countyList.get(position).getCountyCode();
                     Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
-                    intent.putExtra("county_code", countyCode);
+                    intent.putExtra("county_code_part", countyCode);
                     startActivity(intent);
                     finish();
                 }
@@ -95,40 +95,38 @@ public class ChooseAreaActivity extends ActionBarActivity {
 
     private void queryProvinces() {
         provinceList = deerWeatherDB.loadProvinces();
-        if (provinceList.size() == 0) {
-            queryFromFile(deerWeatherDB, FILE_PROVINCE, "province");
-            provinceList = deerWeatherDB.loadProvinces();
+        if (provinceList.size() > 0) {
+            dataList.clear();
+            for (Province province : provinceList) {
+                dataList.add(province.getProvinceName());
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            titleText.setText("中国");
+            currentLevel = LEVEL_PROVINCE;
+        } else {
+            queryFromServerCity(null, "province");
         }
-        dataList.clear();
-        for (Province province : provinceList) {
-            dataList.add(province.getProvinceName());
-        }
-        closeProgressDialog();
-        adapter.notifyDataSetChanged();
-        listView.setSelection(0);
-        titleText.setText("中国");
-        currentLevel = LEVEL_PROVINCE;
-        adapter.notifyDataSetChanged();
     }
 
     private void queryCities() {
-        cityList = deerWeatherDB.loadCities(selectedProvince.getProvinceName());
-        if (cityList.size() == 0) {
-            queryFromFile(deerWeatherDB, FILE_COUNTY, "county");
-            cityList = deerWeatherDB.loadCities(selectedProvince.getProvinceName());
+        cityList = deerWeatherDB.loadCities(selectedProvince.getId());
+        if (cityList.size() > 0) {
+            dataList.clear();
+            for (City city : cityList) {
+                dataList.add(city.getCityName());
+            }
+            adapter.notifyDataSetChanged();
+            listView.setSelection(0);
+            titleText.setText(selectedProvince.getProvinceName());
+            currentLevel = LEVEL_CITY;
+        } else {
+            queryFromServerCity(selectedProvince.getProvinceCode(), "city");
         }
-        dataList.clear();
-        for (City city : cityList) {
-            dataList.add(city.getCityName());
-        }
-        adapter.notifyDataSetChanged();
-        listView.setSelection(0);
-        titleText.setText(selectedProvince.getProvinceName());
-        currentLevel = LEVEL_CITY;
     }
 
     private void queryCounties() {
-        countyList = deerWeatherDB.loadCounties(selectedCity.getCityName());
+        countyList = deerWeatherDB.loadCounties(selectedCity.getId());
         if (countyList.size() > 0) {
             dataList.clear();
             for (County county : countyList) {
@@ -138,26 +136,59 @@ public class ChooseAreaActivity extends ActionBarActivity {
             listView.setSelection(0);
             titleText.setText(selectedCity.getCityName());
             currentLevel = LEVEL_COUNTY;
+        } else {
+            queryFromServerCity(selectedCity.getCityCode(), "county");
         }
     }
 
-    private void queryFromFile(DeerWeatherDB deerWeatherDB, final String fileName, String type) {
-        try {
-            InputStream in = getResources().getAssets().open(fileName);// 下面对获取到的输入流进行读取
-            BufferedReader reader = new BufferedReader(new InputStreamReader(in, "gbk"));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
-            }
-            if ("province".equals(type)) {
-                Utility.handleProvincesResponse(deerWeatherDB, response.toString());
-            } else if ("county".equals(type)) {
-                Utility.handleCountiesResponse(deerWeatherDB, response.toString());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void queryFromServerCity(final String code, final String type) {
+        String address;
+        if (!TextUtils.isEmpty(code)) {
+            address = "http://www.weather.com.cn/data/list3/city" + code + ".xml";
+        } else {
+            address = "http://www.weather.com.cn/data/list3/city.xml";
         }
+        showProgressDialog();
+        HttpUtil.sendHttpRequest(address, new HttpCallBackListener() {
+            @Override
+            public void onFinish(String response) {
+                boolean result = false;
+                if ("province".equals(type)) {
+                    result = Utility.handleProvincesResponse(deerWeatherDB, response);
+                } else if ("city".equals(type)) {
+                    result = Utility.handleCitiesResponse(deerWeatherDB, response, selectedProvince.getId());
+                } else if ("county".equals(type)) {
+                    result = Utility.handleCountiesResponse(deerWeatherDB, response, selectedCity.getId());
+                }
+                if (result) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            closeProgressDialog();
+                            if ("province".equals(type)) {
+                                queryProvinces();
+                            } else if ("city".equals(type)) {
+                                queryCities();
+                            } else if ("county".equals(type)) {
+                                queryCounties();
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        closeProgressDialog();
+                        Toast.makeText(ChooseAreaActivity.this,
+                                "加载失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     /**
