@@ -26,6 +26,11 @@ public class DeerWeatherOpenHelper extends SQLiteOpenHelper{
             + "county_code text, "
             + "city_id integer)";
 
+    public static final String CREATE_MY_COUNTY = "create table MyCounty ("
+            + "id integer primary key autoincrement, "
+            + "county_name text, "
+            + "county_code text)";
+
     public DeerWeatherOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
@@ -35,6 +40,7 @@ public class DeerWeatherOpenHelper extends SQLiteOpenHelper{
         db.execSQL(CREATE_PROVINCE);
         db.execSQL(CREATE_COUNTY);
         db.execSQL(CREATE_CITY);
+        db.execSQL(CREATE_MY_COUNTY);
     }
 
     @Override

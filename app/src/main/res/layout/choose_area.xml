@@ -1,25 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/w"
+    android:id="@+id/choose_area">
 
-    <RelativeLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/ch_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="#739CCE">
-        <TextView
-            android:id="@+id/title_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textColor="#fff"
-            android:textSize="24sp"/>
-    </RelativeLayout>
+        android:layout_height="?attr/actionBarSize"
+        android:layout_gravity="center"
+        android:textAlignment="center"/>
 
     <ListView
         android:id="@+id/list_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:background="@android:color/white">
     </ListView>
 
 </LinearLayout>

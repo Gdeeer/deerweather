@@ -2,9 +2,11 @@ package com.deerweather.app.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.deerweather.app.model.City;
 import com.deerweather.app.model.County;
@@ -14,10 +16,6 @@ import com.deerweather.app.model.Province;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by ${Deer} on 2015/6/23.
@@ -29,7 +27,7 @@ public class Utility {
     public synchronized static boolean handleProvincesResponse(DeerWeatherDB deerWeatherDB, String response) {
         if (!TextUtils.isEmpty(response)) {
             String[] allProvinces = response.split(",");
-            if (allProvinces != null && allProvinces.length > 0) {
+            if (allProvinces.length > 0) {
                 for (String p : allProvinces) {
                     String[] array = p.split("\\|");
                     Province province = new Province();
@@ -46,7 +44,7 @@ public class Utility {
     public static boolean handleCitiesResponse(DeerWeatherDB deerWeatherDB, String response, int provinceId) {
         if (!TextUtils.isEmpty(response)) {
             String[] allCities = response.split(",");
-            if (allCities != null && allCities.length > 0) {
+            if (allCities.length > 0) {
                 for (String c : allCities) {
                     String[] array = c.split("\\|");
                     City city = new City();
@@ -66,7 +64,7 @@ public class Utility {
                                                  String response, int cityId) {
         if (!TextUtils.isEmpty(response)) {
             String[] allCounties = response.split(",");
-            if (allCounties != null && allCounties.length > 0) {
+            if (allCounties.length > 0) {
                 for (String c : allCounties) {
                     String[] array = c.split("\\|");
                     County county = new County();
@@ -81,18 +79,38 @@ public class Utility {
         return false;
     }
 
+
+    public static String handleNameByCoordinates(Context context, String response) {
+        try {
+            String subResponse = response.substring(29, response.length()-1);
+            JSONObject jsonObject = new JSONObject(subResponse);
+            if (jsonObject.get("status").toString().equals("0")) {
+                JSONObject addressComponent = jsonObject.getJSONObject("result").getJSONObject("addressComponent");
+                String address = addressComponent.getString("city");
+                if(address.equals("上海市") || address.equals("北京市") || address.equals("天津市") || address.equals("重庆市"))
+                    address = addressComponent.getString("district");
+                int leng = address.length();
+                address = address.substring(0, leng - 1);
+                Log.d("address", address);
+                return address;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     /**
      * 解析服务器返回的JSON数据，并将解析出的数据存储到本地。
      */
     public static void handleWeatherResponse(Context context, String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
-            Log.d("countyname", response);
+            Log.d("address3", response);
             JSONArray heWeather = jsonObject.getJSONArray("HeWeather data service 3.0");
             JSONObject heWeatherData = heWeather.getJSONObject(0);
-            String aqiString = "空";
-            String qlty = "空";
-            String pm25 = "空";
+            String aqiString = "";
+            String qlty = "";
+            String pm25 = "";
             if (heWeatherData.has("aqi")) {
                 JSONObject aqi = heWeatherData.getJSONObject("aqi");
                 JSONObject city = aqi.getJSONObject("city");
@@ -108,6 +126,7 @@ public class Utility {
 
 
             String nowWeather = now.getJSONObject("cond").getString("txt");
+            String nowWeatherCode = now.getJSONObject("cond").getString("code");
             String nowTemp = now.getString("tmp");
 
             JSONObject todayWeather = dailyForecast.getJSONObject(0);
@@ -117,12 +136,33 @@ public class Utility {
 
             String countyCode = basic.getString("id");
             String countyName = basic.getString("city");
-            Log.d("countyname", countyName);
-            String publishTime = basic.getJSONObject("update").getString("loc");
+            String publishTime = "今天" + basic.getJSONObject("update").getString("loc").substring(10, 16);
 
-            saveWeatherInfo(context, countyCode, countyName,publishTime,
-                    nowTemp, nowWeather, maxTempToday, minTempToday,
+            saveWeatherInfo(context, countyCode, countyName, publishTime,
+                    nowTemp, nowWeather, nowWeatherCode, maxTempToday, minTempToday,
                     aqiString, qlty, pm25);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void handleHourlyTemp(Context context, String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray heWeather = jsonObject.getJSONArray("HeWeather data service 3.0");
+            JSONObject heWeatherData = heWeather.getJSONObject(0);
+            JSONArray dailyForecast = heWeatherData.getJSONArray("hourly_forecast");
+            int n = dailyForecast.length()-1;
+            Log.d("temp", "hh"+n);
+            String[] temp = new String[7];
+            int i, j;
+            for(j=6, i=n; j>=0; j--,i--){
+                if(i>0)
+                    temp[j] = dailyForecast.getJSONObject(i).getString("tmp") + "°";
+                else
+                    temp[j] = "0";
+            }
+            saveHourlyTemp(context, temp[0], temp[1], temp[2], temp[3], temp[4], temp[5], temp[6]);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -137,33 +177,35 @@ public class Utility {
             int i;
             for (i = 1; i < 7; i++) {
                 JSONObject weatherFutureInfo = dailyForecast.getJSONObject(i);
-                String minTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("min")+"~";
-                String maxTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("max")+"℃";
+                String minTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("min") + "~";
+                String maxTempFuture = weatherFutureInfo.getJSONObject("tmp").getString("max") + "℃";
                 String weatherFuture = weatherFutureInfo.getJSONObject("cond").getString("txt_d");
-                String dayFuture = weatherFutureInfo.getString("date").substring(5,7)+"/"
-                        + weatherFutureInfo.getString("date").substring(8,10);
+                String weatherCodeFuture = weatherFutureInfo.getJSONObject("cond").getString("code_d");
+                String dayFuture = weatherFutureInfo.getString("date").substring(5, 7) + "/"
+                        + weatherFutureInfo.getString("date").substring(8, 10);
                 saveWeatherInfofuture(context, minTempFuture, maxTempFuture,
-                        weatherFuture, dayFuture, i);
+                        weatherFuture, weatherCodeFuture, dayFuture, i);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
     /**
      * 将服务器返回的所有天气信息存储到SharedPreferences文件中。
      */
     public static void saveWeatherInfo(Context context, String countyCode, String countyName, String publishTime,
-                                       String nowTemp, String nowWeather, String maxTemp, String minTemp,
+                                       String nowTemp, String nowWeather, String nowWeatherCode, String maxTemp, String minTemp,
                                        String aqiString, String qlty, String pm25) {
 
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("county_selected", true);
         editor.putString("county_code", countyCode);
         editor.putString("county_name", countyName);
-        Log.d("countyname", countyName);
         editor.putString("publish_time", publishTime);
         editor.putString("now_temp", nowTemp);
         editor.putString("now_weather", nowWeather);
+        editor.putString("now_weather_code", nowWeatherCode);
         editor.putString("max_temp", maxTemp);
         editor.putString("min_temp", minTemp);
 
@@ -174,15 +216,28 @@ public class Utility {
         editor.apply();
     }
 
-    public static void saveWeatherInfofuture(Context context, String minTempFuture, String maxTempFuture,
-                                             String weatherFuture, String dayFuture, int i) {
+    public static void saveHourlyTemp(Context context, String temp4, String temp7, String temp10, String temp13, String temp16, String temp19, String temp22) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean("county_selected", true);
-        editor.putString("min_temp_future"+i, minTempFuture);
-        editor.putString("max_temp_future"+i, maxTempFuture);
-        editor.putString("weather_future"+i, weatherFuture);
-        editor.putString("day_future"+i, dayFuture);
+        editor.putString("temp_4", temp4);
+        editor.putString("temp_7", temp7);
+        editor.putString("temp_10", temp10);
+        editor.putString("temp_13", temp13);
+        editor.putString("temp_16", temp16);
+        editor.putString("temp_19", temp19);
+        editor.putString("temp_22", temp22);
         editor.apply();
     }
 
+    public static void saveWeatherInfofuture(Context context, String minTempFuture, String maxTempFuture,
+                                             String weatherFuture, String weatherCodeFuture, String dayFuture, int i) {
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+        editor.putBoolean("county_selected", true);
+        editor.putString("min_temp_future" + i, minTempFuture);
+        editor.putString("max_temp_future" + i, maxTempFuture);
+        editor.putString("weather_code_future" + i, weatherCodeFuture);
+        editor.putString("weather_future" + i, weatherFuture);
+        editor.putString("day_future" + i, dayFuture);
+        editor.apply();
+    }
 }

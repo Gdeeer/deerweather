@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.GeneralSecurityException;
 
 public class HttpUtil {
@@ -18,11 +19,13 @@ public class HttpUtil {
             public void run() {
                 HttpURLConnection connection = null;
                 try {
+                    //String address2 = URLEncoder.encode(address, "UTF-8");
                     URL url = new URL(address);
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
-                    connection.setConnectTimeout(8000);
-                    connection.setReadTimeout(8000);
+                    //connection.setRequestProperty("Accept-Language", "zh-CN");
+                    //connection.setConnectTimeout(8000);
+                    //connection.setReadTimeout(8000);
                     InputStream in = connection.getInputStream();
                     BufferedReader reader = new BufferedReader(new InputStreamReader(in));
                     StringBuilder response = new StringBuilder();

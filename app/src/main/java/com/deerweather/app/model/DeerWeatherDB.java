@@ -26,7 +26,7 @@ public class DeerWeatherDB {
         db = dbHelper.getWritableDatabase();
     }
 
-    public synchronized static DeerWeatherDB getInstance(Context context){
+    public synchronized static DeerWeatherDB getInstance(Context context) {
         if (deerWeatherDB == null) {
             deerWeatherDB = new DeerWeatherDB(context);
         }
@@ -72,7 +72,7 @@ public class DeerWeatherDB {
     public List<City> loadCities(int provinceId) {
         List<City> list = new ArrayList<>();
         Cursor cursor = db.query("City", null, "province_id = ?",
-                new String[] { String.valueOf(provinceId) }, null, null, null);
+                new String[]{String.valueOf(provinceId)}, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 City city = new City();
@@ -102,7 +102,7 @@ public class DeerWeatherDB {
     public List<County> loadCounties(int cityId) {
         List<County> list = new ArrayList<>();
         Cursor cursor = db.query("County", null, "city_id = ?",
-                new String[] { String.valueOf(cityId) }, null, null, null);
+                new String[]{String.valueOf(cityId)}, null, null, null);
         if (cursor.moveToFirst()) {
             do {
                 County county = new County();
@@ -111,11 +111,55 @@ public class DeerWeatherDB {
                         .getColumnIndex("county_name")));
                 county.setCountyCode(cursor.getString(cursor
                         .getColumnIndex("county_code")));
-                Log.d("county",cursor.getString(cursor.getColumnIndex("county_code")) );
+                Log.d("county", cursor.getString(cursor.getColumnIndex("county_code")));
                 county.setCityId(cityId);
                 list.add(county);
             } while (cursor.moveToNext());
         }
         return list;
+    }
+
+
+    public void saveMyCounty(County mCounty) {
+        if (mCounty != null) {
+            ContentValues values = new ContentValues();
+            values.put("county_name", mCounty.getCountyName());
+            values.put("county_code", mCounty.getCountyCode());
+            db.insert("MyCounty", null, values);
+        }
+    }
+
+    public boolean searchMyCounty(County mCounty) {
+        Cursor cursor = db.query("MyCounty", null, null, null, null, null, null);
+        int flag = 0;
+        if (cursor.moveToFirst()) {
+            do {
+                if (mCounty.getCountyName().equals(cursor.getString(cursor.getColumnIndex("county_name"))))
+                    return false;
+            } while (cursor.moveToNext());
+        }
+        return true;
+    }
+
+    public List<County> loadMyCounties() {
+        List<County> list = new ArrayList<>();
+        Cursor cursor = db.query("MyCounty", null, null,
+                null, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                County county = new County();
+                county.setId(cursor.getInt(cursor.getColumnIndex("id")));
+                county.setCountyName(cursor.getString(cursor
+                        .getColumnIndex("county_name")));
+                county.setCountyCode(cursor.getString(cursor
+                        .getColumnIndex("county_code")));
+                list.add(county);
+            } while (cursor.moveToNext());
+        }
+        return list;
+    }
+
+    public void deleteMyCounties(String mCountyName) {
+        db.delete("MyCounty", "county_name == ?", new String[]{mCountyName});
     }
 }

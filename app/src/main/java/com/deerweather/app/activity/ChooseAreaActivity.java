@@ -1,16 +1,25 @@
 package com.deerweather.app.activity;
 
+import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,15 +32,17 @@ import com.deerweather.app.model.Province;
 import com.deerweather.app.util.HttpCallBackListener;
 import com.deerweather.app.util.HttpUtil;
 import com.deerweather.app.util.Utility;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChooseAreaActivity extends ActionBarActivity {
+public class ChooseAreaActivity extends AppCompatActivity {
 
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
@@ -40,7 +51,7 @@ public class ChooseAreaActivity extends ActionBarActivity {
     private boolean isFromWeatherActivity;
 
     private ProgressDialog progressDialog;
-    private TextView titleText;
+    private Toolbar chToolbar;
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private DeerWeatherDB deerWeatherDB;
@@ -54,6 +65,8 @@ public class ChooseAreaActivity extends ActionBarActivity {
     private City selectedCity;
     private int currentLevel;
 
+    private LinearLayout linearLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +79,21 @@ public class ChooseAreaActivity extends ActionBarActivity {
             return;
         }
         setContentView(R.layout.choose_area);
-        titleText = (TextView) findViewById(R.id.title_text);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        }
+        linearLayout = (LinearLayout) findViewById(R.id.choose_area);
+
+        SharedPreferences pref = getSharedPreferences("wallpaper_mode", MODE_PRIVATE);
+        int flag = pref.getInt("mode", 1);
+        if(flag == 2)
+            setWallpaper();
+
+        chToolbar = (Toolbar) findViewById(R.id.ch_toolbar);
+        chToolbar.setTitleTextColor(Color.WHITE);
+
         listView = (ListView) findViewById(R.id.list_view);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
@@ -92,6 +119,20 @@ public class ChooseAreaActivity extends ActionBarActivity {
         queryProvinces();
     }
 
+    public void setWallpaper() {
+        SharedPreferences pref = getSharedPreferences("wallpaper", MODE_PRIVATE);
+        String path = pref.getString("image_path", "");
+        if (!path.equals("")) {
+            try {
+                Uri imageUri = Uri.parse(path);
+                InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                Drawable drawable = Drawable.createFromStream(inputStream, imageUri.toString());
+                linearLayout.setBackground(drawable);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private void queryProvinces() {
         provinceList = deerWeatherDB.loadProvinces();
@@ -102,7 +143,7 @@ public class ChooseAreaActivity extends ActionBarActivity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            titleText.setText("中国");
+            chToolbar.setTitle("中国");
             currentLevel = LEVEL_PROVINCE;
         } else {
             queryFromServerCity(null, "province");
@@ -118,7 +159,8 @@ public class ChooseAreaActivity extends ActionBarActivity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            titleText.setText(selectedProvince.getProvinceName());
+
+            chToolbar.setTitle(selectedProvince.getProvinceName());
             currentLevel = LEVEL_CITY;
         } else {
             queryFromServerCity(selectedProvince.getProvinceCode(), "city");
@@ -134,7 +176,7 @@ public class ChooseAreaActivity extends ActionBarActivity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            titleText.setText(selectedCity.getCityName());
+            chToolbar.setTitle(selectedCity.getCityName());
             currentLevel = LEVEL_COUNTY;
         } else {
             queryFromServerCity(selectedCity.getCityCode(), "county");
@@ -183,7 +225,7 @@ public class ChooseAreaActivity extends ActionBarActivity {
                     @Override
                     public void run() {
                         closeProgressDialog();
-                        Toast.makeText(ChooseAreaActivity.this,
+                        Toast.makeText(getApplicationContext(),
                                 "加载失败", Toast.LENGTH_SHORT).show();
                     }
                 });

@@ -3,39 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.deerweather.app.activity.WeatherActivity"
-    android:background="#739CCE"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp" >
-
-        <Button
-            android:id="@+id/switch_city"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/home" />
-
-        <TextView
-            android:id="@+id/county_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textColor="#fff"
-            android:textSize="24sp" />
-
-        <Button
-            android:id="@+id/refresh_weather"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:background="@drawable/refresh" />
-    </RelativeLayout>
-
+        android:layout_height="?attr/actionBarSize"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
@@ -47,7 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@android:color/transparent"
-            android:dividerHeight="18dp">
+            android:clickable="false"
+            android:listSelector="@android:color/transparent"
+            android:dividerHeight="16dp">
         </ListView>
 
     </android.support.v4.widget.SwipeRefreshLayout>

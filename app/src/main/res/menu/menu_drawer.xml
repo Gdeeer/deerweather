@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/my_county"
+            android:title="我的城市">
+            <menu>
+            </menu>
+        </item>
+        <item
+            android:id="@+id/my_function"
+            android:title="功能">
+            <menu>
+                <item
+                    android:id="@+id/item_place"
+                    android:icon="@drawable/place"
+                    android:title="定位" />
+                <item
+                    android:id="@+id/item_add"
+                    android:icon="@drawable/add"
+                    android:title="添加" />
+                <item
+                    android:id="@+id/item_delete"
+                    android:icon="@drawable/remove"
+                    android:title="删除" />
+                <item
+                    android:id="@+id/item_change"
+                    android:icon="@drawable/color"
+                    android:title="换肤" />
+            </menu>
+        </item>
+    </group>
+</menu>
