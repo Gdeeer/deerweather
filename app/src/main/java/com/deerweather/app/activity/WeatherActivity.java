@@ -1,9 +1,11 @@
 package com.deerweather.app.activity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -17,6 +19,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -37,14 +40,16 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.deerweather.app.Adapter.TempAndWeatherAdapter;
+import com.deerweather.app.adapter.TempAndWeatherAdapter;
 import com.deerweather.app.R;
 import com.deerweather.app.model.County;
 import com.deerweather.app.model.DeerWeatherDB;
 import com.deerweather.app.model.TempAndWeather;
+import com.deerweather.app.service.AutoUpdateService;
 import com.deerweather.app.util.HttpCallBackListener;
 import com.deerweather.app.util.HttpUtil;
 import com.deerweather.app.util.Utility;
+import com.deerweather.app.widget.WeatherWidget;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,25 +65,22 @@ public class WeatherActivity extends AppCompatActivity implements
 
     public static final int TAKE_PHOTO = 1;
     public static final int CROP_PHOTO = 2;
+    public static final int ACCESS_FINE_LOCATION_REQUEST_CODE = 100;
+    private Uri mImageUri;
+    private LinearLayout mLinear;
 
-    private Uri imageUri;
-    private LinearLayout linear;
-    private Drawable drawable;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    private SwipeRefreshLayout swipeRefreshLayout;
-
-    private List<TempAndWeather> tempAndWeatherList = new ArrayList<>();
-    private TempAndWeatherAdapter adapter;
-
-    private ListView listView;
+    private List<TempAndWeather> mTempAndWeathers = new ArrayList<>();
+    private TempAndWeatherAdapter mTempAndWeatherAdapter;
 
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private Toolbar mToolbar;
 
-    private DeerWeatherDB deerWeatherDB;
+    private DeerWeatherDB mDeerWeatherDB;
     private List<County> mCounty = new ArrayList<>();
-    private List<String> savedCounty = new ArrayList<>();
+    private List<String> mSavedCounty = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,13 +92,13 @@ public class WeatherActivity extends AppCompatActivity implements
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
 
-        linear = (LinearLayout) findViewById(R.id.weather_all);
+        mLinear = (LinearLayout) findViewById(R.id.weather_all);
 
         SharedPreferences pref = getSharedPreferences("wallpaper_mode", MODE_PRIVATE);
         int flag = pref.getInt("mode", 1);
-        if (flag == 2)
+        if (flag == 2) {
             setWallpaper();
-
+        }
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbar.setTitleTextColor(Color.WHITE);
         mToolbar.setTitle("小鹿天气");
@@ -104,12 +106,12 @@ public class WeatherActivity extends AppCompatActivity implements
 
         SharedPreferences pref2 = getSharedPreferences("first_or_not", MODE_PRIVATE);
         Boolean flag2 = pref2.getBoolean("first", true);
-        if (flag2)
+        if (flag2) {
             Positioning();
-
-        SharedPreferences.Editor editor = getSharedPreferences("first_or_not", MODE_PRIVATE).edit();
-        editor.putBoolean("first", false);
-        editor.apply();
+            SharedPreferences.Editor editor = getSharedPreferences("first_or_not", MODE_PRIVATE).edit();
+            editor.putBoolean("first", false);
+            editor.apply();
+        }
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar,
@@ -117,21 +119,21 @@ public class WeatherActivity extends AppCompatActivity implements
         mDrawerToggle.syncState();//初始化状态
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe);
-        swipeRefreshLayout.setOnRefreshListener(this);
-        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe);
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+        mSwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
                 android.R.color.holo_green_light, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
 
-        mNavigationView = (NavigationView) findViewById(R.id.id_navigationview);
+        mNavigationView = (NavigationView) findViewById(R.id.id_navigation_view);
         onNavgationViewMenuItemSelected(mNavigationView);
 
-        listView = (ListView) findViewById(R.id.temp_weather_list_view);
-        adapter = new TempAndWeatherAdapter(WeatherActivity.this,
-                R.layout.item1, tempAndWeatherList);
-        listView.setAdapter(adapter);
+        ListView listView = (ListView) findViewById(R.id.temp_weather_list_view);
+        mTempAndWeatherAdapter = new TempAndWeatherAdapter(WeatherActivity.this,
+                R.layout.item1, mTempAndWeathers);
+        listView.setAdapter(mTempAndWeatherAdapter);
 
-        deerWeatherDB = DeerWeatherDB.getInstance(this);
+        mDeerWeatherDB = DeerWeatherDB.getInstance(this);
         String countyCodePart = getIntent().getStringExtra("county_code_part");
         if (!TextUtils.isEmpty(countyCodePart)) {
             try {
@@ -151,10 +153,10 @@ public class WeatherActivity extends AppCompatActivity implements
         String path = pref.getString("image_path", "");
         if (!path.equals("")) {
             try {
-                imageUri = Uri.parse(path);
-                InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                Drawable drawable = Drawable.createFromStream(inputStream, imageUri.toString());
-                linear.setBackground(drawable);
+                mImageUri = Uri.parse(path);
+                InputStream inputStream = getContentResolver().openInputStream(mImageUri);
+                Drawable drawable = Drawable.createFromStream(inputStream, mImageUri.toString());
+                mLinear.setBackground(drawable);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -168,7 +170,7 @@ public class WeatherActivity extends AppCompatActivity implements
             public void run() {
                 // 停止刷新
                 refresh();
-                swipeRefreshLayout.setRefreshing(false);
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         }, 600);
     }
@@ -179,7 +181,7 @@ public class WeatherActivity extends AppCompatActivity implements
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 switch (menuItem.getItemId()) {
-                    case R.id.item_place:
+                    case R.id.item_location:
                         Positioning();
                         break;
                     case R.id.item_add:
@@ -193,7 +195,7 @@ public class WeatherActivity extends AppCompatActivity implements
                         final List<Integer> mSelectedItems = new ArrayList<>();
                         AlertDialog.Builder builder = new AlertDialog.Builder(WeatherActivity.this);
                         builder.setTitle("选择")
-                                .setMultiChoiceItems(savedCounty.toArray(new CharSequence[savedCounty.size()]), null,
+                                .setMultiChoiceItems(mSavedCounty.toArray(new CharSequence[mSavedCounty.size()]), null,
                                         new DialogInterface.OnMultiChoiceClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which,
@@ -214,7 +216,7 @@ public class WeatherActivity extends AppCompatActivity implements
                                         // or return them to the component that opened the dialog
                                         Integer n = mSelectedItems.size();
                                         for (Integer i = 0; i < n; i++) {
-                                            deerWeatherDB.deleteMyCounties(savedCounty.get(mSelectedItems.get(i)));
+                                            mDeerWeatherDB.deleteMyCounties(mSavedCounty.get(mSelectedItems.get(i)));
                                         }
                                         refresh();
                                     }
@@ -238,7 +240,7 @@ public class WeatherActivity extends AppCompatActivity implements
                                             SharedPreferences.Editor editor = getSharedPreferences("wallpaper_mode", MODE_PRIVATE).edit();
                                             editor.putInt("mode", 1);
                                             editor.apply();
-                                            linear.setBackgroundResource(R.drawable.w);
+                                            mLinear.setBackgroundResource(R.drawable.w);
                                         } else {
                                             SharedPreferences.Editor editor = getSharedPreferences("wallpaper_mode", MODE_PRIVATE).edit();
                                             editor.putInt("mode", 2);
@@ -255,10 +257,16 @@ public class WeatherActivity extends AppCompatActivity implements
                         AlertDialog dialog2 = builder2.create();
                         dialog2.show();
                         break;
+                    case R.id.item_about:
+                        Intent intent2 = new Intent(WeatherActivity.this, About.class);
+                        startActivity(intent2);
+                        break;
+                    default:
+                        break;
                 }
 
                 // Menu item点击后选中，并关闭Drawerlayout
-                menuItem.setChecked(true);
+                //menuItem.setChecked(true);
                 mDrawerLayout.closeDrawers();
 
                 return true;
@@ -268,6 +276,12 @@ public class WeatherActivity extends AppCompatActivity implements
 
 
     public void Positioning() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    ACCESS_FINE_LOCATION_REQUEST_CODE);
+            return;
+        }
         mToolbar.setTitle("定位中...");
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         /*
@@ -317,9 +331,9 @@ public class WeatherActivity extends AppCompatActivity implements
         switch (requestCode) {
             case TAKE_PHOTO:
                 if (resultCode == RESULT_OK) {
-                    imageUri = data.getData();
+                    mImageUri = data.getData();
                     Intent intent = new Intent("com.android.camera.action.CROP");
-                    intent.setDataAndType(imageUri, "image/*");
+                    intent.setDataAndType(mImageUri, "image/*");
                     File outputImage = new File(Environment.getExternalStorageDirectory(), "output_image.jpg");
                     try {
                         if (outputImage.exists()) {
@@ -329,7 +343,7 @@ public class WeatherActivity extends AppCompatActivity implements
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    imageUri = Uri.fromFile(outputImage);
+                    mImageUri = Uri.fromFile(outputImage);
                     intent.putExtra("scale", true);
                     DisplayMetrics dm = getResources().getDisplayMetrics();
                     int w_screen = dm.widthPixels;
@@ -338,7 +352,7 @@ public class WeatherActivity extends AppCompatActivity implements
                     intent.putExtra("aspectY", h_screen);
                     intent.putExtra("outputX", w_screen);// 输出图片大小
                     intent.putExtra("outputY", h_screen);
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageUri);
                     startActivityForResult(intent, CROP_PHOTO); // 启动裁剪程序
                     Log.d("ppp", "ppp");
                 }
@@ -346,15 +360,31 @@ public class WeatherActivity extends AppCompatActivity implements
             case CROP_PHOTO:
                 if (resultCode == RESULT_OK) {
                     try {
-                        InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                        Drawable drawable = Drawable.createFromStream(inputStream, imageUri.toString());
-                        linear.setBackground(drawable);
+                        InputStream inputStream = getContentResolver().openInputStream(mImageUri);
+                        Drawable drawable = Drawable.createFromStream(inputStream, mImageUri.toString());
+                        mLinear.setBackground(drawable);
                         SharedPreferences.Editor editor = getSharedPreferences("wallpaper", MODE_PRIVATE).edit();
-                        editor.putString("image_path", imageUri.toString());
+                        editor.putString("image_path", mImageUri.toString());
                         editor.apply();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case ACCESS_FINE_LOCATION_REQUEST_CODE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED){
+
+                }else {
+                    Toast.makeText(WeatherActivity.this, "获取权限失败,请手动选择。", Toast.LENGTH_SHORT).show();
                 }
                 break;
             default:
@@ -405,7 +435,6 @@ public class WeatherActivity extends AppCompatActivity implements
     }
 
     private void queryFromServer(final String address, final String type) {
-        Log.d("address3", address);
         HttpUtil.sendHttpRequest(address, new HttpCallBackListener() {
             @Override
             public void onFinish(final String response) {
@@ -430,7 +459,6 @@ public class WeatherActivity extends AppCompatActivity implements
                 } else {
                     if (!TextUtils.isEmpty(response)) {
                         String countyName = Utility.handleNameByCoordinates(WeatherActivity.this, response);
-                        Log.d("address2", countyName);
                         try {
                             countyName = URLEncoder.encode(countyName, "UTF-8");
                         } catch (UnsupportedEncodingException e) {
@@ -458,19 +486,69 @@ public class WeatherActivity extends AppCompatActivity implements
         County county1 = new County();
         county1.setCountyName(prefs.getString("county_name", ""));
         county1.setCountyCode(prefs.getString("county_code", ""));
-        if (deerWeatherDB.searchMyCounty(county1)) {
+        if (mDeerWeatherDB.searchMyCounty(county1)) {
             Log.d("county", "executed");
-            deerWeatherDB.saveMyCounty(county1);
+            mDeerWeatherDB.saveMyCounty(county1);
         }
     }
 
+
+    private void showWeather() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        mToolbar.setTitle(prefs.getString("county_name", ""));
+        TempAndWeather tempAndWeather1 = new TempAndWeather();
+        tempAndWeather1.setPublishTime(prefs.getString("publish_time", "") + " 更新 ");
+        tempAndWeather1.setNowTemp(prefs.getString("now_temp", ""));
+        tempAndWeather1.setMinTemp(prefs.getString("min_temp", ""));
+        tempAndWeather1.setMaxTemp(prefs.getString("max_temp", ""));
+        mTempAndWeathers.clear();
+        mTempAndWeathers.add(tempAndWeather1);
+        TempAndWeather tempAndWeather2 = new TempAndWeather();
+        tempAndWeather2.setWeatherCode(prefs.getString("now_weather_code", ""));
+        tempAndWeather2.setWeatherNow(prefs.getString("now_weather", ""));
+        mTempAndWeathers.add(tempAndWeather2);
+        TempAndWeather tempAndWeather3 = new TempAndWeather();
+        tempAndWeather3.setQlty(prefs.getString("qlty", ""));
+        tempAndWeather3.setAqi(prefs.getString("aqi", ""));
+        tempAndWeather3.setPm25(prefs.getString("pm25", ""));
+        mTempAndWeathers.add(tempAndWeather3);
+        TempAndWeather tempAndWeather5 = new TempAndWeather();
+        tempAndWeather5.setTemp4(prefs.getString("temp_4", ""));
+        tempAndWeather5.setTemp7(prefs.getString("temp_7", ""));
+        tempAndWeather5.setTemp10(prefs.getString("temp_10", ""));
+        tempAndWeather5.setTemp13(prefs.getString("temp_13", ""));
+        tempAndWeather5.setTemp16(prefs.getString("temp_16", ""));
+        tempAndWeather5.setTemp19(prefs.getString("temp_19", ""));
+        tempAndWeather5.setTemp22(prefs.getString("temp_22", ""));
+        mTempAndWeathers.add(tempAndWeather5);
+        for (int i = 1; i < 8; i++) {
+            TempAndWeather tempAndWeather4 = new TempAndWeather();
+            tempAndWeather4.setMinTempFuture(prefs.getString("min_temp_future" + i, ""));
+            tempAndWeather4.setMaxTempFuture(prefs.getString("max_temp_future" + i, ""));
+            tempAndWeather4.setWeatherFuture(prefs.getString("weather_future" + i, ""));
+            tempAndWeather4.setWeatherCodeFuture(prefs.getString("weather_code_future" + i, ""));
+            tempAndWeather4.setDayFuture(prefs.getString("day_future" + i, ""));
+            mTempAndWeathers.add(tempAndWeather4);
+        }
+        mTempAndWeatherAdapter.notifyDataSetChanged();
+
+        saveMyCounties();
+        loadMyCounties();
+
+        Intent intent = new Intent(WeatherActivity.this, AutoUpdateService.class);
+        startService(intent);
+
+        Intent intent1 = new Intent("com.android.CHANGE");
+        sendBroadcast(intent1);
+    }
+
     private void loadMyCounties() {
-        mCounty = deerWeatherDB.loadMyCounties();
+        mCounty = mDeerWeatherDB.loadMyCounties();
         final SubMenu menu = mNavigationView.getMenu().getItem(0).getSubMenu();
         menu.clear();
-        savedCounty.clear();
+        mSavedCounty.clear();
         for (int i = 0; i < mCounty.size(); i++) {
-            savedCounty.add(mCounty.get(i).getCountyName());
+            mSavedCounty.add(mCounty.get(i).getCountyName());
             menu.add(mCounty.get(i).getCountyName()).setIcon(R.drawable.round);
             MenuItem item = menu.getItem(i);
             final int finalI = i;
@@ -497,50 +575,6 @@ public class WeatherActivity extends AppCompatActivity implements
             wrapped.notifyDataSetChanged();
         }
     }
-
-    private void showWeather() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mToolbar.setTitle(prefs.getString("county_name", ""));
-        TempAndWeather tempAndWeather1 = new TempAndWeather();
-        tempAndWeather1.setPublishTime(prefs.getString("publish_time", "") + " 更新 ");
-        tempAndWeather1.setNowTemp(prefs.getString("now_temp", ""));
-        tempAndWeather1.setMinTemp(prefs.getString("min_temp", ""));
-        tempAndWeather1.setMaxTemp(prefs.getString("max_temp", ""));
-        tempAndWeatherList.clear();
-        tempAndWeatherList.add(tempAndWeather1);
-        TempAndWeather tempAndWeather2 = new TempAndWeather();
-        tempAndWeather2.setWeatherCode(prefs.getString("now_weather_code", ""));
-        tempAndWeather2.setWeatherNow(prefs.getString("now_weather", ""));
-        tempAndWeatherList.add(tempAndWeather2);
-        TempAndWeather tempAndWeather3 = new TempAndWeather();
-        tempAndWeather3.setQlty(prefs.getString("qlty", ""));
-        tempAndWeather3.setAqi(prefs.getString("aqi", ""));
-        tempAndWeather3.setPm25(prefs.getString("pm25", ""));
-        tempAndWeatherList.add(tempAndWeather3);
-        TempAndWeather tempAndWeather5 = new TempAndWeather();
-        tempAndWeather5.setTemp4(prefs.getString("temp_4", ""));
-        tempAndWeather5.setTemp7(prefs.getString("temp_7", ""));
-        tempAndWeather5.setTemp10(prefs.getString("temp_10", ""));
-        tempAndWeather5.setTemp13(prefs.getString("temp_13", ""));
-        tempAndWeather5.setTemp16(prefs.getString("temp_16", ""));
-        tempAndWeather5.setTemp19(prefs.getString("temp_19", ""));
-        tempAndWeather5.setTemp22(prefs.getString("temp_22", ""));
-        tempAndWeatherList.add(tempAndWeather5);
-        for (int i = 1; i < 8; i++) {
-            TempAndWeather tempAndWeather4 = new TempAndWeather();
-            tempAndWeather4.setMinTempFuture(prefs.getString("min_temp_future" + i, ""));
-            tempAndWeather4.setMaxTempFuture(prefs.getString("max_temp_future" + i, ""));
-            tempAndWeather4.setWeatherFuture(prefs.getString("weather_future" + i, ""));
-            tempAndWeather4.setWeatherCodeFuture(prefs.getString("weather_code_future" + i, ""));
-            tempAndWeather4.setDayFuture(prefs.getString("day_future" + i, ""));
-            tempAndWeatherList.add(tempAndWeather4);
-        }
-        adapter.notifyDataSetChanged();
-
-        saveMyCounties();
-        loadMyCounties();
-    }
-
 
     @Override
     public void onBackPressed() {

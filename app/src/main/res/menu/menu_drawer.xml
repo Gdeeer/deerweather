@@ -4,30 +4,34 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/my_county"
-            android:title="我的城市">
+            android:title="@string/my_county">
             <menu>
             </menu>
         </item>
         <item
             android:id="@+id/my_function"
-            android:title="功能">
+            android:title="@string/function">
             <menu>
                 <item
-                    android:id="@+id/item_place"
+                    android:id="@+id/item_location"
                     android:icon="@drawable/place"
-                    android:title="定位" />
+                    android:title="@string/location"/>
                 <item
                     android:id="@+id/item_add"
                     android:icon="@drawable/add"
-                    android:title="添加" />
+                    android:title="@string/add_county"/>
                 <item
                     android:id="@+id/item_delete"
                     android:icon="@drawable/remove"
-                    android:title="删除" />
+                    android:title="@string/delete_county"/>
                 <item
                     android:id="@+id/item_change"
                     android:icon="@drawable/color"
-                    android:title="换肤" />
+                    android:title="@string/change_wall"/>
+                <item
+                    android:id="@+id/item_about"
+                    android:icon="@drawable/ic_info_outline_black_24dp"
+                    android:title="@string/about"/>
             </menu>
         </item>
     </group>

@@ -1,4 +1,4 @@
-package com.deerweather.app.Adapter;
+package com.deerweather.app.adapter;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,18 +11,19 @@ import android.widget.TextView;
 
 import com.deerweather.app.R;
 import com.deerweather.app.model.TempAndWeather;
-
-import org.w3c.dom.Text;
+import com.deerweather.app.util.Utility;
 
 import java.util.List;
 
 public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
 
-    final int TYPE_1 = 0 ;
-    final int TYPE_2 = 1 ;
-    final int TYPE_3 = 2 ;
-    final int TYPE_4 = 3 ;
-    final int TYPE_5 = 4 ;
+    public static final String TAG="ttaagg";
+
+    final int TYPE_1 = 0;
+    final int TYPE_2 = 1;
+    final int TYPE_3 = 2;
+    final int TYPE_4 = 3;
+    final int TYPE_5 = 4;
 
     public TempAndWeatherAdapter(Context context, int resId, List<TempAndWeather> objects) {
         super(context, resId, objects);
@@ -56,7 +57,7 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
         ViewHolder4 viewHolder4 = null;
         ViewHolder5 viewHolder5 = null;
         int type = getItemViewType(position);
-        if(convertView == null || convertView.getTag()==null) {
+        if (convertView == null || convertView.getTag() == null) {
             switch (type) {
                 case TYPE_1:
                     convertView = LayoutInflater.from(getContext()).inflate(R.layout.item1, null);
@@ -83,7 +84,7 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
                     convertView.setTag(viewHolder3);
                     break;
                 case TYPE_5:
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item5, null);
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item4, null);
                     viewHolder5 = new ViewHolder5();
                     viewHolder5.temp4 = (TextView) convertView.findViewById(R.id.temp_4);
                     viewHolder5.temp7 = (TextView) convertView.findViewById(R.id.temp_7);
@@ -95,7 +96,7 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
                     convertView.setTag(viewHolder5);
                     break;
                 case TYPE_4:
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item4, null);
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item5, null);
                     viewHolder4 = new ViewHolder4();
                     viewHolder4.minTempFutureText = (TextView) convertView.findViewById(R.id.min_temp_future);
                     viewHolder4.maxTempFutureText = (TextView) convertView.findViewById(R.id.max_temp_future);
@@ -125,7 +126,7 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
             }
         }
 
-        switch(type) {
+        switch (type) {
             case TYPE_1:
                 viewHolder1.publishText.setText(tempAndWeather.getPublishTime());
                 viewHolder1.nowTempText.setText(tempAndWeather.getNowTemp());
@@ -134,161 +135,7 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
                 break;
             case TYPE_2:
                 String id = tempAndWeather.getWeatherCode();
-                switch (id){
-                    case "100":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d100);
-                        break;
-                    case "101":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d101);
-                        break;
-                    case "102":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d102);
-                        break;
-                    case "103":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d103);
-                        break;
-                    case "104":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d104);
-                        break;
-                    case "200":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d200);
-                        break;
-                    case "201":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d201);
-                        break;
-                    case "202":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d202);
-                        break;
-                    case "203":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d203);
-                        break;
-                    case "204":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d204);
-                        break;
-                    case "205":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d205);
-                        break;
-                    case "206":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d206);
-                        break;
-                    case "207":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d207);
-                        break;
-                    case "208":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d208);
-                        break;
-                    case "209":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d209);
-                        break;
-                    case "210":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d210);
-                        break;
-                    case "211":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d211);
-                        break;
-                    case "212":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d212);
-                        break;
-                    case "213":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d213);
-                        break;
-                    case "300":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d300);
-                        break;
-                    case "301":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d301);
-                        break;
-                    case "302":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d302);
-                        break;
-                    case "303":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d303);
-                        break;
-                    case "304":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d304);
-                        break;
-                    case "305":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d305);
-                        break;
-                    case "306":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d306);
-                        break;
-                    case "307":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d307);
-                        break;
-                    case "308":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d308);
-                        break;
-                    case "309":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d309);
-                        break;
-                    case "310":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d310);
-                        break;
-                    case "311":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d311);
-                        break;
-                    case "312":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d312);
-                        break;
-                    case "313":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d313);
-                        break;
-                    case "400":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d400);
-                        break;
-                    case "401":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d401);
-                        break;
-                    case "402":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d402);
-                        break;
-                    case "403":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d403);
-                        break;
-                    case "404":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d404);
-                        break;
-                    case "405":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d405);
-                        break;
-                    case "406":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d406);
-                        break;
-                    case "407":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d407);
-                        break;
-                    case "500":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d500);
-                        break;
-                    case "501":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d501);
-                        break;
-                    case "502":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d502);
-                        break;
-                    case "503":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d503);
-                        break;
-                    case "504":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d504);
-                        break;
-                    case "507":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d507);
-                        break;
-                    case "508":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d508);
-                        break;
-                    case "900":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d900);
-                        break;
-                    case "901":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d901);
-                        break;
-                    case "999":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d999);
-                        break;
-                }
+                viewHolder2.weatherImage.setImageResource(Utility.map.get(id));
                 viewHolder2.weatherNowText.setText(tempAndWeather.getWeatherNow());
                 break;
             case TYPE_3:
@@ -309,160 +156,9 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
                 viewHolder4.minTempFutureText.setText(tempAndWeather.getMinTempFuture());
                 viewHolder4.maxTempFutureText.setText(tempAndWeather.getMaxTempFuture());
                 String idFuture = tempAndWeather.getWeatherCodeFuture();
-                switch (idFuture){
-                    case "100":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d100);
-                        break;
-                    case "101":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d101);
-                        break;
-                    case "102":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d102);
-                        break;
-                    case "103":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d103);
-                        break;
-                    case "104":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d104);
-                        break;
-                    case "200":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d200);
-                        break;
-                    case "201":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d201);
-                        break;
-                    case "202":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d202);
-                        break;
-                    case "203":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d203);
-                        break;
-                    case "204":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d204);
-                        break;
-                    case "205":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d205);
-                        break;
-                    case "206":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d206);
-                        break;
-                    case "207":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d207);
-                        break;
-                    case "208":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d208);
-                        break;
-                    case "209":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d209);
-                        break;
-                    case "210":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d210);
-                        break;
-                    case "211":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d211);
-                        break;
-                    case "212":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d212);
-                        break;
-                    case "213":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d213);
-                        break;
-                    case "300":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d300);
-                        break;
-                    case "301":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d301);
-                        break;
-                    case "302":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d302);
-                        break;
-                    case "303":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d303);
-                        break;
-                    case "304":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d304);
-                        break;
-                    case "305":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d305);
-                        break;
-                    case "306":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d306);
-                        break;
-                    case "307":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d307);
-                        break;
-                    case "308":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d308);
-                        break;
-                    case "309":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d309);
-                        break;
-                    case "310":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d310);
-                        break;
-                    case "311":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d311);
-                        break;
-                    case "312":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d312);
-                        break;
-                    case "313":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d313);
-                        break;
-                    case "400":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d400);
-                        break;
-                    case "401":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d401);
-                        break;
-                    case "402":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d402);
-                        break;
-                    case "403":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d403);
-                        break;
-                    case "404":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d404);
-                        break;
-                    case "405":
-                        viewHolder2.weatherImage.setImageResource(R.drawable.d405);
-                        break;
-                    case "406":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d406);
-                        break;
-                    case "407":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d407);
-                        break;
-                    case "500":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d500);
-                        break;
-                    case "501":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d501);
-                        break;
-                    case "502":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d502);
-                        break;
-                    case "503":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d503);
-                        break;
-                    case "504":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d504);
-                        break;
-                    case "507":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d507);
-                        break;
-                    case "508":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d508);
-                        break;
-                    case "900":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d900);
-                        break;
-                    case "901":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d901);
-                        break;
-                    case "999":
-                        viewHolder4.weatherFutureImage.setImageResource(R.drawable.d999);
-                        break;
+                if (!idFuture.equals("")) {
+                    Log.d(TAG, "getView: "+idFuture);
+                    viewHolder4.weatherFutureImage.setImageResource(Utility.map.get(idFuture));
                 }
                 viewHolder4.weatherFutureText.setText(tempAndWeather.getWeatherFuture());
                 viewHolder4.dayFutureText.setText(tempAndWeather.getDayFuture());
@@ -478,15 +174,18 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
         TextView minTempText;
         TextView maxTempText;
     }
+
     class ViewHolder2 {
         ImageView weatherImage;
         TextView weatherNowText;
     }
+
     class ViewHolder3 {
         TextView qltyText;
         TextView aqiText;
         TextView pm25Text;
     }
+
     class ViewHolder4 {
         TextView minTempFutureText;
         TextView maxTempFutureText;
@@ -494,6 +193,7 @@ public class TempAndWeatherAdapter extends ArrayAdapter<TempAndWeather> {
         TextView weatherFutureText;
         TextView dayFutureText;
     }
+
     class ViewHolder5 {
         TextView temp4;
         TextView temp7;

@@ -7,4 +7,17 @@
     <string name="title_activity_weather">WeatherActivity</string>
     <string name="open">open</string>
     <string name="close">close</string>
+    <string name="location">定位</string>
+    <string name="add_county">添加</string>
+    <string name="delete_county">删除</string>
+    <string name="change_wall">换肤</string>
+    <string name="function">功能</string>
+    <string name="my_county">我的城市</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="about">关于</string>
+    <string name="address_github">开源地址</string>
+    <string name="my_weibo">我的微博</string>
+    <string name="feedback">意见反馈</string>
+    <string name="contribute">捐         赠</string>
 </resources>

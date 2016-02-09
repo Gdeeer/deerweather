@@ -1,8 +1,9 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.deerweather.app.activity.WeatherActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.deerweather.app.activity.WeatherActivity"
     android:orientation="vertical">
 
     <android.support.v7.widget.Toolbar
@@ -19,10 +20,10 @@
             android:id="@+id/temp_weather_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:divider="@android:color/transparent"
             android:clickable="false"
-            android:listSelector="@android:color/transparent"
-            android:dividerHeight="16dp">
+            android:divider="@android:color/transparent"
+            android:dividerHeight="16dp"
+            android:listSelector="@android:color/transparent">
         </ListView>
 
     </android.support.v4.widget.SwipeRefreshLayout>
