@@ -1,0 +1,28 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_choose_theme"
+        android:orderInCategory="70"
+        android:title="选择一个主题"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_update_theme"
+        android:orderInCategory="80"
+        android:title="修改当前主题"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_create_theme"
+        android:orderInCategory="90"
+        android:title="创建新的主题"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_share"
+        android:orderInCategory="100"
+        android:title="分享"
+        app:showAsAction="never"
+        android:actionProviderClass="android.widget.ShareActionProvider"/>
+</menu>

@@ -14,20 +14,16 @@
             <menu>
                 <item
                     android:id="@+id/item_location"
-                    android:icon="@drawable/place"
+                    android:icon="@drawable/ic_location"
                     android:title="@string/location"/>
                 <item
                     android:id="@+id/item_add"
-                    android:icon="@drawable/add"
+                    android:icon="@drawable/ic_add"
                     android:title="@string/add_county"/>
                 <item
                     android:id="@+id/item_delete"
-                    android:icon="@drawable/remove"
+                    android:icon="@drawable/ic_remove"
                     android:title="@string/delete_county"/>
-                <item
-                    android:id="@+id/item_change"
-                    android:icon="@drawable/color"
-                    android:title="@string/change_wall"/>
                 <item
                     android:id="@+id/item_about"
                     android:icon="@drawable/ic_info_outline_black_24dp"

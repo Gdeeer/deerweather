@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/ll_widget_1"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:background="#FFFFFF">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="top|left"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_now_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="2"
+                android:gravity="center"
+                android:text="13:25"
+                android:textColor="#937fff"
+                android:textSize="35sp"/>
+
+            <TextView
+                android:id="@+id/tv_publish_time_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center|top"
+                android:text="13:00 更新"
+                android:textColor="#937fff"
+                android:textSize="13sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="bottom|right"
+            android:orientation="vertical">
+
+
+            <TextView
+                android:id="@+id/tv_county_and_weather_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|right"
+                android:paddingRight="16dp"
+                android:text="宝山 | 晴"
+                android:textColor="#937fff"
+                android:textSize="26sp"/>
+
+            <TextView
+                android:id="@+id/tv_temp_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-condensed"
+                android:gravity="center|right"
+                android:paddingRight="16dp"
+                android:text="17°"
+                android:textColor="#937fff"
+                android:textSize="26sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3">
+
+        <LinearLayout
+            android:id="@+id/ll_temp_hourly_0_widget_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#43cfff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_hourly_0_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center"
+                android:text="13h"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_weather_hourly_0_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="晴"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_temp_hourly_0_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|top"
+                android:text="12°"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_temp_hourly_1_widget_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#53bfff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_hourly_1_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|bottom"
+                android:text="14h"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_weather_hourly_1_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="晴"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_temp_hourly_1_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|top"
+                android:text="12°"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_temp_hourly_2_widget_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#63afff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_hourly_2_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|bottom"
+                android:text="15h"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_weather_hourly_2_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="晴"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_temp_hourly_2_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|top"
+                android:text="12°"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_temp_hourly_3_widget_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#759fff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_hourly_3_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|bottom"
+                android:text="16h"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_weather_hourly_3_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="晴"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_temp_hourly_3_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|top"
+                android:text="12°"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_temp_hourly_4_widget_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#848fff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_hourly_4_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|bottom"
+                android:text="17h"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_weather_hourly_4_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="晴"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_temp_hourly_4_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|top"
+                android:text="12°"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_temp_hourly_5_widget_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#937fff"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_time_hourly_5_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|bottom"
+                android:text="18h"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_weather_hourly_5_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="晴"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/tv_temp_hourly_5_widget_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center|top"
+                android:text="12°"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/weather_all"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/w"
-    android:orientation="vertical">
+    >
+
+    <com.deerweather.app.view.ColorView
+        android:id="@+id/cv_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="190dp"
+        android:background="#e3bfbb"/>
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -22,6 +27,5 @@
             android:layout_gravity="start"
             app:headerLayout="@layout/navigation_header"
             app:menu="@menu/menu_drawer"/>
-
     </android.support.v4.widget.DrawerLayout>
-</LinearLayout>
+</RelativeLayout>

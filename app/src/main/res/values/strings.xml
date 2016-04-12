@@ -20,4 +20,5 @@
     <string name="my_weibo">我的微博</string>
     <string name="feedback">意见反馈</string>
     <string name="contribute">捐         赠</string>
+    <string name="configure">Configure</string>
 </resources>

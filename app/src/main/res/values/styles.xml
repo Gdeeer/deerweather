@@ -3,7 +3,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name="android:fitsSystemWindows">true</item>
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--<item name="android:windowActionBar">false</item>-->
+
         <item name="drawerArrowStyle">@style/WhiteDrawerIconStyle</item>
     </style>
 
@@ -12,4 +14,8 @@
         <item name="color">@android:color/white</item>
     </style>
 
+    <style name="PopAnimation">
+        <item name="android:windowEnterAnimation">@anim/popup_show</item>
+        <item name="android:windowExitAnimation">@anim/popup_hide</item>
+    </style>
 </resources>

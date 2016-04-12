@@ -1,24 +1,35 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/w"
-    android:id="@+id/choose_area">
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/ch_toolbar"
+    <com.deerweather.app.view.ColorView
+        android:id="@+id/cv_toolbar_choose"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="center"
-        android:textAlignment="center"/>
+        android:layout_height="182dp"/>
 
-    <ListView
-        android:id="@+id/list_view"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:background="@android:color/white">
-    </ListView>
+        android:orientation="vertical"
+        android:fitsSystemWindows="true">
 
-</LinearLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_choose"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_gravity="center"
+            android:fitsSystemWindows="true"
+            android:textAlignment="center"/>
+
+        <ListView
+            android:id="@+id/lv_choose"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbar_choose"
+            android:background="@android:color/white"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp">
+        </ListView>
+    </LinearLayout>
+</RelativeLayout>

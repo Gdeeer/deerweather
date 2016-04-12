@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+    <item
+        android:id="@+id/action_picture"
+        android:title="图片"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/action_color"
+        android:title="色彩"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/action_change_single"
+                android:title="单选"
+                app:showAsAction="always"/>
+            <item
+                android:id="@+id/action_choose_all"
+                android:title="全选"
+                app:showAsAction="always">
+                <menu>
+                    <item
+                        android:id="@+id/action_all_different"
+                        android:title="混色"
+                        app:showAsAction="always"/>
+                    <item
+                        android:id="@+id/action_all_same"
+                        android:title="纯色"/>
+                    <item
+                        android:id="@+id/action_all_gradual"
+                        android:title="渐变"/>
+                </menu>
+            </item>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/action_save_theme"
+        android:title="保存"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_quit"
+        android:title="退出"
+        app:showAsAction="ifRoom"/>
+</menu>

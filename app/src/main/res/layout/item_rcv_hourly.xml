@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="70dp"
+    android:layout_height="match_parent"
+    xmlns:tool="http://schemas.android.com/tools"
+    tool:background="@color/primary"
+    android:paddingBottom="15dp"
+    android:paddingTop="5dp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_time_hourly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="7dp"
+        android:paddingTop="7dp"
+        tool:text="13:00"
+        android:text="--:--"
+        android:textColor="@android:color/white"/>
+
+    <ImageView
+        android:id="@+id/iv_weather_hourly"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:padding="8dp"
+        tool:src="@drawable/thunder"/>
+
+    <TextView
+        android:id="@+id/tv_temp_hourly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="7dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="7dp"
+        tool:text="21°"
+        android:text="--"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"/>
+
+    <TextView
+        android:id="@+id/tv_aqi_hourly"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingBottom="7dp"
+        android:paddingTop="7dp"
+        tool:text="AQI 21"
+        android:text="--"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"/>
+</LinearLayout>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/rv_pop_item"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    tool:background="@color/primary">
+
+    <View
+        android:id="@+id/view_pop_item_0"
+        android:layout_width="40dp"
+        android:layout_height="22dp"
+        tool:background="#7F4081"/>
+
+    <View
+        android:id="@+id/view_pop_item_1"
+        android:layout_below="@id/view_pop_item_0"
+        android:layout_width="40dp"
+        android:layout_height="23dp"
+        tool:background="#6F4081"/>
+
+    <View
+        android:id="@+id/view_pop_item_2"
+        android:layout_width="40dp"
+        android:layout_height="23dp"
+        android:layout_below="@id/view_pop_item_1"
+        tool:background="#5F4081"/>
+
+    <View
+        android:id="@+id/view_pop_item_3"
+        android:layout_width="40dp"
+        android:layout_height="23dp"
+        android:layout_below="@id/view_pop_item_2"
+        tool:background="#4F4081"/>
+
+    <View
+        android:id="@+id/view_pop_item_4"
+        android:layout_width="40dp"
+        android:layout_height="23dp"
+        android:layout_below="@id/view_pop_item_3"
+        tool:background="#3F4081"/>
+
+    <View
+        android:id="@+id/view_pop_item_5"
+        android:layout_width="40dp"
+        android:layout_height="23dp"
+        android:layout_below="@id/view_pop_item_4"
+        tool:background="#2F4081"/>
+
+    <View
+        android:id="@+id/view_pop_item_6"
+        android:layout_width="40dp"
+        android:layout_height="23dp"
+        android:layout_below="@id/view_pop_item_5"
+        tool:background="#1F4081"/>
+
+    <ImageView
+        android:id="@+id/iv_selected"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:padding="2dp"
+        android:src="@drawable/ic_check_circle_24dp"/>
+</RelativeLayout>

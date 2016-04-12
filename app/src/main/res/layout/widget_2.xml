@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/ll_widget_2"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tool:background="#222222">
+
+    <RelativeLayout
+        android:id="@+id/rl_widget2_left"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#937fff">
+
+        <TextView
+            android:id="@+id/tv_temp_now_widget_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingLeft="17dp"
+            android:text="17°"
+            android:textColor="@android:color/white"
+            android:textSize="40sp"/>
+
+        <TextView
+            android:id="@+id/tv_min_temp_today_widget_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:paddingBottom="18dp"
+            android:paddingRight="25dp"
+            android:text="L 11°"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"/>
+
+        <TextView
+            android:id="@+id/tv_max_temp_today_widget_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tv_min_temp_today_widget_2"
+            android:layout_alignParentRight="true"
+            android:paddingRight="25dp"
+            android:text="H 19°"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"/>
+
+        <TextView
+            android:id="@+id/tv_weather_now_widget_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tv_max_temp_today_widget_2"
+            android:layout_alignParentRight="true"
+            android:paddingBottom="5dp"
+            android:paddingRight="25dp"
+            android:text="晴"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"/>
+
+
+        <TextView
+            android:id="@+id/tv_county_widget_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:paddingBottom="18dp"
+            android:paddingLeft="25dp"
+            android:text="宝山"
+            android:textColor="@android:color/white"
+            android:textSize="13sp"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_widget2_right"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="#ffffff">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="8dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_day_0"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="周一"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_temp_day_0"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="3°/12°"
+                    android:gravity="right"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_weather_day_0"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="多云"
+                    android:gravity="center"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_day_1"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="周二"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_temp_day_1"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="3°/12°"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_weather_day_1"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="多云"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_day_2"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="周三"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_temp_day_2"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="3°/12°"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_weather_day_2"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="多云"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_day_3"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="周四"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_temp_day_3"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="3°/12°"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_weather_day_3"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="多云"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="8dp"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_day_4"
+                    android:layout_width="0dp"
+                    android:layout_weight="3"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="周五"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_temp_day_4"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="right"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="3°/12°"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_weather_day_4"
+                    android:layout_width="0dp"
+                    android:layout_weight="4"
+                    android:gravity="center"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:padding="7dp"
+                    android:text="多云"
+                    android:textColor="#937fff"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

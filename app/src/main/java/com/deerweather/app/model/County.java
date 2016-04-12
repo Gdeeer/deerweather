@@ -1,5 +1,7 @@
 package com.deerweather.app.model;
 
+import android.location.Location;
+
 /**
  * Created by DELL-PC on 2015/6/22.
  */
@@ -7,6 +9,9 @@ public class County {
     private int id;
     private String countyName;
     private String countyCode;
+    private String mLongitude;
+    private String mLatitude;
+
     private int cityId;
     public int getId() {
         return id;
@@ -31,5 +36,21 @@ public class County {
     }
     public void setCityId(int cityId) {
         this.cityId = cityId;
+    }
+
+    public String getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(String longitude) {
+        mLongitude = longitude;
+    }
+
+    public String getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(String latitude) {
+        mLatitude = latitude;
     }
 }

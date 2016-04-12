@@ -1,30 +1,381 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.deerweather.app.activity.WeatherActivity"
+    android:id="@+id/ll_weather_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:fitsSystemWindows="true"
+    android:orientation="vertical"
+    tools:context="com.deerweather.app.activity.WeatherActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"/>
+        android:layout_height="?attr/actionBarSize"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_marginTop="-6dp">
 
-        <ListView
-            android:id="@+id/temp_weather_list_view"
+        <com.deerweather.app.view.MyNestedScrollView
+            android:id="@+id/nsv_main"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="false"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="16dp"
-            android:listSelector="@android:color/transparent">
-        </ListView>
+            android:layout_height="match_parent">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <View
+                    android:id="@+id/view_toolbar_extend"
+                    android:layout_width="match_parent"
+                    android:layout_height="110dp"
+                    android:background="@android:color/transparent"
+                    android:visibility="gone"/>
+
+                <RelativeLayout
+                    android:id="@+id/rl_temperature"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_main_item"
+                    android:layout_gravity="center">
+
+                    <com.deerweather.app.view.ColorView
+                        android:id="@+id/cv_temp"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/height_main_item"
+                        tools:background="@drawable/bg_nav_2"/>
+
+                    <!--android:background="#e3bb88"-->
+                    <TextView
+                        android:id="@+id/tv_publish_time"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:text="今天 --:-- 发布"
+                        android:textColor="#FFF"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_temp_now"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:fontFamily="sans-serif-thin"
+                        android:paddingTop="5dp"
+                        android:text="--"
+                        tools:text="17"
+                        android:textColor="#FFFFFF"
+                        android:textSize="110sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_toRightOf="@id/tv_temp_now"
+                        android:fontFamily="sans-serif-thin"
+                        android:paddingLeft="-8dp"
+                        android:paddingTop="18dp"
+                        android:text="°"
+                        android:textColor="#FFFFFF"
+                        android:textSize="100sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_aqi_now"
+                        android:layout_centerHorizontal="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:layout_marginBottom="9dp"
+                        android:textColor="@android:color/white"
+                        android:text ="AQI -- >"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_weather"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_main_item"
+                    android:background="#db9864"
+                    android:orientation="vertical">
+
+                    <com.deerweather.app.view.ColorView
+                        android:id="@+id/cv_img_weather_now"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:background="@drawable/bg_nav_3"/>
+
+                    <!--android:background="#db9864"-->
+
+                    <ImageView
+                        android:id="@+id/iv_weather_now"
+                        android:layout_width="128dp"
+                        android:layout_height="128dp"
+                        android:layout_marginTop="14dp"
+                        android:layout_marginBottom="20dp"
+                        android:layout_centerHorizontal="true"
+                        tools:src="@drawable/cloud_day"/>
+
+                    <TextView
+                        android:id="@+id/tv_weather_now"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/iv_weather_now"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="-14dp"
+                        android:text="--"
+                        tools:text="多云"
+                        android:textColor="#FFF"
+                        android:textSize="18sp"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_hourly"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_main_item">
+
+                    <com.deerweather.app.view.ColorView
+                        android:id="@+id/cv_hourly"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/height_main_item"
+                        tools:background="#b0695a"/>
+
+                    <com.deerweather.app.view.MyRecyclerView
+                        android:id="@+id/rcv_hourly"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_weekly_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_main_item">
+
+                    <com.deerweather.app.view.ColorView
+                        android:id="@+id/cv_weekly_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/height_main_item"
+                        tools:background="#e3bb88"/>
+
+                    <com.deerweather.app.view.MyRecyclerView
+                        android:id="@+id/rcv_weekly"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_weekly_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_main_item">
+
+                    <com.deerweather.app.view.ColorView
+                        android:id="@+id/cv_weekly_chart"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/height_main_item"
+                        tools:background="#937e8e"/>
+
+                    <com.deerweather.app.view.LineGraphicView
+                        android:id="@+id/line_weekly"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/height_main_item"/>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_suggestion"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/height_main_item"
+                    tools:background="#937e8e">
+
+                    <com.deerweather.app.view.ColorView
+                        android:id="@+id/cv_suggestion"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/height_main_item"
+                        android:background="#b0695a"/>
+
+                    <LinearLayout
+                        android:id="@+id/ll_suggestion_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="95dp"
+                        android:paddingTop="15dp">
+
+                        <com.deerweather.app.view.MyLinearLayout
+                            android:id="@+id/ll_comf"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:padding="2dp"
+                                android:textSize="12sp"
+                                android:text="舒适度"/>
+
+                            <TextView
+                                android:id="@+id/tv_comf"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="2dp"
+                                android:textColor="@android:color/white"
+                                android:text="--"/>
+                        </com.deerweather.app.view.MyLinearLayout>
+
+                        <com.deerweather.app.view.MyLinearLayout
+                            android:id="@+id/ll_drsg"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp"
+                                android:text="穿衣"/>
+
+                            <TextView
+                                android:id="@+id/tv_drsg"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="2dp"
+                                android:textColor="@android:color/white"
+                                android:text="--"/>
+                        </com.deerweather.app.view.MyLinearLayout>
+
+                        <com.deerweather.app.view.MyLinearLayout
+                            android:id="@+id/ll_flu"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp"
+                                android:text="感冒"/>
+
+                            <TextView
+                                android:id="@+id/tv_flu"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="2dp"
+                                android:textColor="@android:color/white"
+                                android:text="--"/>
+                        </com.deerweather.app.view.MyLinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_below="@id/ll_suggestion_1"
+                        android:layout_width="match_parent"
+                        android:layout_height="95dp"
+                        android:paddingBottom="15dp">
+
+                        <com.deerweather.app.view.MyLinearLayout
+                            android:id="@+id/ll_uv"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:padding="2dp"
+                                android:textSize="12sp"
+                                android:text="紫外线"/>
+
+                            <TextView
+                                android:id="@+id/tv_uv"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="2dp"
+                                android:textColor="@android:color/white"
+                                android:text="--"/>
+                        </com.deerweather.app.view.MyLinearLayout>
+
+                        <com.deerweather.app.view.MyLinearLayout
+                            android:id="@+id/ll_sport"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp"
+                                android:text="运动"/>
+
+                            <TextView
+                                android:id="@+id/tv_sport"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="2dp"
+                                android:textColor="@android:color/white"
+                                android:text="--"/>
+                        </com.deerweather.app.view.MyLinearLayout>
+
+                        <com.deerweather.app.view.MyLinearLayout
+                            android:id="@+id/ll_cw"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@android:color/white"
+                                android:textSize="12sp"
+                                android:text="洗车"/>
+
+                            <TextView
+                                android:id="@+id/tv_cw"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="2dp"
+                                android:textColor="@android:color/white"
+                                android:text="--"/>
+                        </com.deerweather.app.view.MyLinearLayout>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tv_share"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5dp"
+                        android:layout_gravity="end"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:textColor="@android:color/white"
+                        android:text=" @ 小鹿天气"/>
+                </RelativeLayout>
+            </LinearLayout>
+        </com.deerweather.app.view.MyNestedScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

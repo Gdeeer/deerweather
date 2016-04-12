@@ -13,7 +13,9 @@ import android.widget.RemoteViews;
 
 import com.deerweather.app.R;
 import com.deerweather.app.activity.WeatherActivity;
-import com.deerweather.app.util.Utility;
+import com.deerweather.app.util.JSONUtility;
+import com.deerweather.app.util.SharedPreferenceUtil;
+import com.deerweather.app.util.ViewUtil;
 
 /**
  * Implementation of App Widget functionality.
@@ -29,16 +31,9 @@ public class WeatherWidget extends AppWidgetProvider {
         if (intent.getAction().equals(CHANGE_ACTION)) {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.weather_widget);
-            Log.d(TAG, "onReceive: from_activity");
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            String id = prefs.getString("now_weather_code", "100");
-            String weather = prefs.getString("now_weather", "晴");
-            String temp = prefs.getString("now_temp", "9");
-            String county = prefs.getString("county_name", "没找到");
-            remoteViews.setImageViewResource(R.id.widget_image, Utility.map.get(id));
-            remoteViews.setTextViewText(R.id.widget_county, county);
-            remoteViews.setTextViewText(R.id.widget_temp, temp);
-            remoteViews.setTextViewText(R.id.widget_weather, weather);
+            SharedPreferenceUtil mPrefs = new SharedPreferenceUtil(context);
+            setView(remoteViews, mPrefs);
+
             appWidgetManager.updateAppWidget(new ComponentName(context, WeatherWidget.class), remoteViews);
         }
     }
@@ -58,26 +53,31 @@ public class WeatherWidget extends AppWidgetProvider {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.weather_widget);
 //        views.setTextViewText(R.id.appwidget_text, widgetText);
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        String id = prefs.getString("now_weather_code", "100");
-        String weather = prefs.getString("now_weather", "晴");
-        String temp = prefs.getString("now_temp", "9");
-        String county = prefs.getString("county_name", "上海");
-//            views.setImageViewUri(R.id.widget_image, Uri.parse("android.resource://"+ packageName +"/"+ R.drawable.id));
-        remoteViews.setImageViewResource(R.id.widget_image, Utility.map.get(id));
-        remoteViews.setTextViewText(R.id.widget_county, county);
-        remoteViews.setTextViewText(R.id.widget_temp, temp);
-        remoteViews.setTextViewText(R.id.widget_weather, weather);
+        SharedPreferenceUtil mPrefs = new SharedPreferenceUtil(context);
+
+        setView(remoteViews, mPrefs);
+
         Intent intentClick = new Intent(context, WeatherActivity.class);
-        intentClick.putExtra("click", true);
+//        intentClick.putExtra("click", true);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intentClick, 0);
         remoteViews.setOnClickPendingIntent(R.id.widget_image, pendingIntent);
         remoteViews.setOnClickPendingIntent(R.id.widget_county, pendingIntent);
         remoteViews.setOnClickPendingIntent(R.id.widget_temp, pendingIntent);
         remoteViews.setOnClickPendingIntent(R.id.widget_weather, pendingIntent);
-        remoteViews.setOnClickPendingIntent(R.id.widget_temp_du, pendingIntent);
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews);
+    }
+
+    public static void setView(RemoteViews views, SharedPreferenceUtil prefs) {
+        String code = prefs.getWeatherCodeNow();
+        String weather = prefs.getWeatherNow();
+        String temp = prefs.getTempNow() + "°";
+        String county = prefs.getCountyName();
+
+        views.setImageViewResource(R.id.widget_image, ViewUtil.getImageResource(code));
+        views.setTextViewText(R.id.widget_county, county);
+        views.setTextViewText(R.id.widget_temp, temp);
+        views.setTextViewText(R.id.widget_weather, weather);
     }
 
     @Override

@@ -1,22 +1,23 @@
 package com.deerweather.app.activity;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.deerweather.app.R;
@@ -26,15 +27,13 @@ import java.io.InputStream;
 
 public class About extends AppCompatActivity implements View.OnClickListener {
 
-
-    private Uri mImageUri;
-    private RelativeLayout mRelativeLayout;
-    private Button mGithub;
-    private Button mWeibo;
-    private Button mFeedback;
-    private Button mContribute;
     private PopupWindow mPopFeedback;
     private PopupWindow mPopContribute;
+
+    private LinearLayout mLlGithub;
+    private LinearLayout mLlSina;
+    private LinearLayout mLlQQ;
+    private LinearLayout mLlContribute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,84 +45,75 @@ public class About extends AppCompatActivity implements View.OnClickListener {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
 
-        mRelativeLayout = (RelativeLayout) findViewById(R.id.relative);
-
-        SharedPreferences pref = getSharedPreferences("wallpaper_mode", MODE_PRIVATE);
-        int flag = pref.getInt("mode", 1);
-        if (flag == 2) {
-            setWallpaper();
-        }
-
-        mGithub = (Button) findViewById(R.id.address_github);
-        mWeibo = (Button) findViewById(R.id.my_weibo);
-        mFeedback = (Button) findViewById(R.id.feedback);
-        mContribute = (Button) findViewById(R.id.contribute);
-
-        mGithub.setOnClickListener(this);
-        mWeibo.setOnClickListener(this);
-        mFeedback.setOnClickListener(this);
-        mContribute.setOnClickListener(this);
-    }
-
-    public void setWallpaper() {
-        SharedPreferences pref = getSharedPreferences("wallpaper", MODE_PRIVATE);
-        String path = pref.getString("image_path", "");
-        if (!path.equals("")) {
-            try {
-                mImageUri = Uri.parse(path);
-                InputStream inputStream = getContentResolver().openInputStream(mImageUri);
-                Drawable drawable = Drawable.createFromStream(inputStream, mImageUri.toString());
-                mRelativeLayout.setBackground(drawable);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        mLlGithub = (LinearLayout) findViewById(R.id.ll_github);
+        mLlSina = (LinearLayout) findViewById(R.id.ll_sina);
+        mLlQQ = (LinearLayout) findViewById(R.id.ll_qq);
+        mLlContribute = (LinearLayout) findViewById(R.id.ll_contribute);
+        mLlGithub.setOnClickListener(this);
+        mLlSina.setOnClickListener(this);
+        mLlQQ.setOnClickListener(this);
+        mLlContribute.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         int id = v.getId();
         switch (id) {
-            case R.id.address_github:
+            case R.id.ll_github:
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse("https://github.com/Gdeeer/deerweather"));
                 startActivity(intent);
                 break;
-            case R.id.my_weibo:
+            case R.id.ll_sina:
                 Intent intent2 = new Intent(Intent.ACTION_VIEW);
                 intent2.setData(Uri.parse("http://weibo.com/u/2681148603"));
                 startActivity(intent2);
                 break;
-            case R.id.feedback:
-                Toast.makeText(getApplicationContext(), "还没做好，不如去微博留个言(=￣ω￣=)", Toast.LENGTH_SHORT).show();
+            case R.id.ll_qq:
+                joinQQGroup("rky9modNWZkxefT1naU5xI7nlijqKH27");
                 break;
-            case R.id.contribute:
-                showPopContribute(v);
+            case R.id.ll_contribute:
+                ClipboardManager cm = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData clipData = ClipData.newPlainText("comment", "1533691934@qq.com");
+                cm.setPrimaryClip(clipData);
+//                Snackbar.make(v, "已保存至剪贴板", Snackbar.LENGTH_SHORT).setAction("确定", null).show();
+
+
+                Snackbar snackbar = Snackbar.make(v, "已保存至剪贴板（支付宝账号）", Snackbar.LENGTH_LONG);
+                ViewGroup group = (ViewGroup) snackbar.getView();
+                group.setBackgroundColor(ContextCompat.getColor(this, R.color.snackbar));
+                snackbar.setAction("确定", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                    }
+                });
+                snackbar.setActionTextColor(ContextCompat.getColor(this, R.color.snackbar_action));
+                snackbar.show();
                 break;
             default:
                 break;
         }
     }
 
-    public void showPopContribute(View view) {
-        View contentView = getLayoutInflater().inflate(R.layout.pop_contribute_content, null);
-        mPopContribute = new PopupWindow(contentView, LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        mPopContribute.setFocusable(true);
-        mPopContribute.setOutsideTouchable(true);
-
-        int[] location = new int[2];
-        mContribute.getLocationOnScreen(location);
-
-//        mPopContribute.showAtLocation(mContribute, Gravity.TOP|Gravity.LEFT, location[0], location[1]);
-        contentView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (mPopContribute.isShowing()) {
-                    mPopContribute.dismiss();
-                }
-                return false;
-            }
-        });
-        mPopContribute.showAsDropDown(mContribute, 0, -1020);
+    /****************
+     *
+     * 发起添加群流程。群号：deerweather(244037411) 的 key 为： rky9modNWZkxefT1naU5xI7nlijqKH27
+     * 调用 joinQQGroup(rky9modNWZkxefT1naU5xI7nlijqKH27) 即可发起手Q客户端申请加群 deerweather(244037411)
+     *
+     * @param key 由官网生成的key
+     * @return 返回true表示呼起手Q成功，返回fals表示呼起失败
+     ******************/
+    public boolean joinQQGroup(String key) {
+        Intent intent = new Intent();
+        intent.setData(Uri.parse("mqqopensdkapi://bizAgent/qm/qr?url=http%3A%2F%2Fqm.qq.com%2Fcgi-bin%2Fqm%2Fqr%3Ffrom%3Dapp%26p%3Dandroid%26k%3D" + key));
+        // 此Flag可根据具体产品需要自定义，如设置，则在加群界面按返回，返回手Q主界面，不设置，按返回会返回到呼起产品界面    //intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        try {
+            startActivity(intent);
+            return true;
+        } catch (Exception e) {
+            // 未安装手Q或安装的版本不支持
+            return false;
+        }
     }
+
 }

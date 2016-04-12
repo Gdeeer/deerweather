@@ -2,13 +2,11 @@ package com.deerweather.app.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -27,7 +25,8 @@ import com.deerweather.app.model.DeerWeatherDB;
 import com.deerweather.app.model.Province;
 import com.deerweather.app.util.HttpCallBackListener;
 import com.deerweather.app.util.HttpUtil;
-import com.deerweather.app.util.Utility;
+import com.deerweather.app.util.JSONUtility;
+import com.deerweather.app.view.ColorView;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -40,10 +39,8 @@ public class ChooseAreaActivity extends AppCompatActivity {
     public static final int LEVEL_CITY = 1;
     public static final int LEVEL_COUNTY = 2;
 
-    private boolean isFromWeatherActivity;
-
     private ProgressDialog progressDialog;
-    private Toolbar chToolbar;
+    private Toolbar mToolbar;
     private ListView listView;
     private ArrayAdapter<String> adapter;
     private DeerWeatherDB deerWeatherDB;
@@ -57,36 +54,27 @@ public class ChooseAreaActivity extends AppCompatActivity {
     private City selectedCity;
     private int currentLevel;
 
-    private LinearLayout linearLayout;
+    private ColorView mCvToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity", false);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean("county_selected", false) && !isFromWeatherActivity) {
-            Intent intent = new Intent(this, WeatherActivity.class);
-            startActivity(intent);
-            finish();
-            return;
-        }
         setContentView(R.layout.choose_area);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         }
-        linearLayout = (LinearLayout) findViewById(R.id.choose_area);
 
-        SharedPreferences pref = getSharedPreferences("wallpaper_mode", MODE_PRIVATE);
-        int flag = pref.getInt("mode", 1);
-        if(flag == 2)
-            setWallpaper();
+        mCvToolbar = (ColorView) findViewById(R.id.cv_toolbar_choose);
 
-        chToolbar = (Toolbar) findViewById(R.id.ch_toolbar);
-        chToolbar.setTitleTextColor(Color.WHITE);
+        setWallpaper();
 
-        listView = (ListView) findViewById(R.id.list_view);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_choose);
+        mToolbar.setTitleTextColor(Color.WHITE);
+        setSupportActionBar(mToolbar);
+
+        listView = (ListView) findViewById(R.id.lv_choose);
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
         deerWeatherDB = DeerWeatherDB.getInstance(this);
@@ -101,9 +89,9 @@ public class ChooseAreaActivity extends AppCompatActivity {
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String countyCode = countyList.get(position).getCountyCode();
-                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    Intent intent = new Intent();
                     intent.putExtra("county_code_part", countyCode);
-                    startActivity(intent);
+                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
@@ -112,17 +100,22 @@ public class ChooseAreaActivity extends AppCompatActivity {
     }
 
     public void setWallpaper() {
-        SharedPreferences pref = getSharedPreferences("wallpaper", MODE_PRIVATE);
-        String path = pref.getString("image_path", "");
-        if (!path.equals("")) {
+        String picturePath = getIntent().getStringExtra("picture");
+        int color = getIntent().getIntExtra("color", 0);
+        if (picturePath != null && !picturePath.equals("")) {
+            Uri pictureUri = Uri.parse(picturePath);
+            InputStream inputStream = null;
             try {
-                Uri imageUri = Uri.parse(path);
-                InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                Drawable drawable = Drawable.createFromStream(inputStream, imageUri.toString());
-                linearLayout.setBackground(drawable);
+                inputStream = getContentResolver().openInputStream(pictureUri);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+            Drawable drawable = Drawable.createFromStream(inputStream, pictureUri.toString());
+//            mLlToolbar.setBackground(drawable);
+            mCvToolbar.setBackground(drawable);
+        } else {
+//            mLlToolbar.setBackgroundColor(color);
+            mCvToolbar.setBackgroundColor(color);
         }
     }
 
@@ -135,7 +128,9 @@ public class ChooseAreaActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            chToolbar.setTitle("中国");
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("中国");
+            }
             currentLevel = LEVEL_PROVINCE;
         } else {
             queryFromServerCity(null, "province");
@@ -151,8 +146,9 @@ public class ChooseAreaActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-
-            chToolbar.setTitle(selectedProvince.getProvinceName());
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(selectedProvince.getProvinceName());
+            }
             currentLevel = LEVEL_CITY;
         } else {
             queryFromServerCity(selectedProvince.getProvinceCode(), "city");
@@ -168,7 +164,9 @@ public class ChooseAreaActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            chToolbar.setTitle(selectedCity.getCityName());
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle(selectedCity.getCityName());
+            }
             currentLevel = LEVEL_COUNTY;
         } else {
             queryFromServerCity(selectedCity.getCityCode(), "county");
@@ -188,11 +186,11 @@ public class ChooseAreaActivity extends AppCompatActivity {
             public void onFinish(String response) {
                 boolean result = false;
                 if ("province".equals(type)) {
-                    result = Utility.handleProvincesResponse(deerWeatherDB, response);
+                    result = JSONUtility.handleProvincesResponse(deerWeatherDB, response);
                 } else if ("city".equals(type)) {
-                    result = Utility.handleCitiesResponse(deerWeatherDB, response, selectedProvince.getId());
+                    result = JSONUtility.handleCitiesResponse(deerWeatherDB, response, selectedProvince.getId());
                 } else if ("county".equals(type)) {
-                    result = Utility.handleCountiesResponse(deerWeatherDB, response, selectedCity.getId());
+                    result = JSONUtility.handleCountiesResponse(deerWeatherDB, response, selectedCity.getId());
                 }
                 if (result) {
                     runOnUiThread(new Runnable() {
@@ -257,11 +255,7 @@ public class ChooseAreaActivity extends AppCompatActivity {
         } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();
         } else {
-            if (isFromWeatherActivity) {
-                Intent intent = new Intent(this, WeatherActivity.class);
-                startActivity(intent);
-            }
-            finish();
+            super.onBackPressed();
         }
     }
 }
