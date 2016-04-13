@@ -48,8 +48,7 @@
                     <com.deerweather.app.view.ColorView
                         android:id="@+id/cv_temp"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/height_main_item"
-                        tools:background="@drawable/bg_nav_2"/>
+                        android:layout_height="@dimen/height_main_item"/>
 
                     <!--android:background="#e3bb88"-->
                     <TextView

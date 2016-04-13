@@ -499,16 +499,26 @@ public class WeatherActivity extends AppCompatActivity implements
                     SimpleDateFormat sDateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss");
                     String timeNow = sDateFormat.format(new Date());
 //                    文件名只能有数字，字母，下划线等，不然提取不出来。
+
+                    File dir = new File(Environment.getExternalStorageDirectory() + "/deerweather");
+                    if (!dir.exists()){
+                        dir.mkdir();
+                        Log.d(TAG, "onActivityResult: " + "mkdir");
+                    }
+
                     File outputImage = new File(Environment.getExternalStorageDirectory() + "/deerweather/", "bg_" + timeNow + ".jpg");
                     try {
                         if (outputImage.exists()) {
                             outputImage.delete();
                         }
                         outputImage.createNewFile();
+                        Log.d(TAG, "onActivityResult: " + mImageUri);
                     } catch (IOException e) {
                         e.printStackTrace();
+                        Log.d(TAG, "onActivityResult: " + "fail");
                     }
                     mImageUri = Uri.fromFile(outputImage);
+
                     intent.putExtra("scale", true);
                     DisplayMetrics dm = getResources().getDisplayMetrics();
                     int w_screen = dm.widthPixels;
@@ -1100,7 +1110,6 @@ public class WeatherActivity extends AppCompatActivity implements
 
         for (int i = 0; i < count; i++) {
             ColorView colorView = colorViews.get(i);
-//            colorView.set
             colorView.setBackgroundColor(colorViews.get(i).getColorPre());
             colorView.setDuration(duration);
             colorView.setColor(Color.argb(255, reds[i], greens[i], blues[i]));
@@ -1236,7 +1245,9 @@ public class WeatherActivity extends AppCompatActivity implements
             mLlUv.setNeedDispatch(true);
             mLlSport.setNeedDispatch(true);
             mLlCw.setNeedDispatch(true);
+            Log.d("theme_", "onOptionsItemSelected: " + "begin_0");
             if (mFlagThemeChanged) {
+                Log.d("theme_", "onOptionsItemSelected: " + "begin_1");
                 ItemTheme itemTheme = new ItemTheme();
                 ArrayList<Integer> colors = new ArrayList<>();
                 ArrayList<String> pictureUrls = new ArrayList<>();
@@ -1257,26 +1268,29 @@ public class WeatherActivity extends AppCompatActivity implements
                     }
                 }
 
+                Log.d("theme_", "onOptionsItemSelected: " + "begin");
                 if (mModeType == MODE_UPDATE) {
                     mModeType = MODE_NORMAL;
                     mChangeModeType = MODE_CHANGE_NORMAL;
                     itemTheme.setColors(colors);
                     itemTheme.setPictureUrls(pictureUrls);
                     itemTheme.setId(mItemThemes.get(mThemeNow).getId());
-                    Log.d(TAG, "onOptionsItemSelected: " + mItemThemes.get(mThemeNow).getId());
+                    Log.d("theme_", "onOptionsItemSelected: " + mItemThemes.get(mThemeNow).getId());
                     mDeerWeatherDB.updateMyTheme(itemTheme);
                     mFlagThemeChanged = false;
-//                    mThemeNow = mItemThemes.size();
                 } else {
                     mModeType = MODE_NORMAL;
                     mChangeModeType = MODE_CHANGE_NORMAL;
                     itemTheme.setColors(colors);
                     itemTheme.setPictureUrls(pictureUrls);
                     mDeerWeatherDB.saveMyTheme(itemTheme);
+                    mItemThemes = (ArrayList<ItemTheme>) mDeerWeatherDB.loadMyTheme();
                     mFlagThemeChanged = false;
-                    mThemeNow = mItemThemes.size();
+                    Log.d("theme", "onOptionsItemSelected: " + mItemThemes.size());
+                    mThemeNow = mItemThemes.size()-1;
                 }
                 mPrefs.setThemeNow(mThemeNow);
+                Log.d("theme_", "onOptionsItemSelected: " + "begin_3");
                 Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "主题已存在", Toast.LENGTH_SHORT).show();

@@ -138,11 +138,21 @@ public class OtherUtil {
     public static Uri savePic(Bitmap b) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.CHINA);
 
-        File outfileD = new File(Environment.getExternalStorageDirectory() + "/deerweather/share");
+        File dirDeerWeather = new File(Environment.getExternalStorageDirectory() + "/deerweather");
         // 如果文件不存在，则创建一个新文件
-        if (!outfileD.isDirectory()) {
+        if (!dirDeerWeather.isDirectory()) {
             try {
-                outfileD.mkdir();
+                dirDeerWeather.mkdir();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        File dirShare = new File(Environment.getExternalStorageDirectory() + "/deerweather/share");
+        // 如果文件不存在，则创建一个新文件
+        if (!dirShare.isDirectory()) {
+            try {
+                dirShare.mkdir();
             } catch (Exception e) {
                 e.printStackTrace();
             }

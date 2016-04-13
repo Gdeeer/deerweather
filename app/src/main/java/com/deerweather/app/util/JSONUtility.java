@@ -88,9 +88,9 @@ public class JSONUtility {
             JSONObject jsonObject = new JSONObject(subResponse);
             if (jsonObject.get("status").toString().equals("0")) {
                 JSONObject addressComponent = jsonObject.getJSONObject("result").getJSONObject("addressComponent");
-                String address = addressComponent.getString("city");
-                if (address.equals("上海市") || address.equals("北京市") || address.equals("天津市") || address.equals("重庆市"))
-                    address = addressComponent.getString("district");
+//                String address = addressComponent.getString("city");
+//                if (address.equals("上海市") || address.equals("北京市") || address.equals("天津市") || address.equals("重庆市"))
+                String address = addressComponent.getString("district");
                 address = address.substring(0, address.length() - 1);
                 return address;
             }
